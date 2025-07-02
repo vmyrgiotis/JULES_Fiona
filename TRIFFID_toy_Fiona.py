@@ -2,7 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 
-# parameters for two PFT: broadleaf tree and C3 grass, from Clark et al (2011) Table 6 and 7
+# parameters for two PFTs: broadleaf tree and C3 grass, from Clark et al (2011) Table 6 and 7
 params = {
     'sigma1': np.array([0.0375, 0.0250]),  # leaf C per LAI
     'awl': np.array([0.65, 0.005]),        # woody allometry coeff
@@ -45,7 +45,7 @@ def triffid_rhs(t, y):
     # NPP for each PFT, using the pre-defined sine wave
     Pi = np.array([Pi_t(t), Pi_t(t)])
 
-    # dLb/dt, derived from Eq. 51 (This one is a bit complicated - I am still working on the maths!)
+    # dLb/dt, derived from Eq. 51 (This one is a bit tricky - I am still working on the maths!)
     dLb_dt = (1 - lam) * Pi / params['sigma1'] \
              - (params['gamma_l'] + params['gamma_r']) * Lb \
              - (params['gamma_w'] * W) / params['sigma1']
