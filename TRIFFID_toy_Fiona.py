@@ -39,19 +39,26 @@ def triffid_rhs(t, y):
     W = params['awl'] * Lb ** params['bwl']
     Cv = L + R + W
 
+    # local litterfall rate Lamba1, according to Eq. 59
+    Lambda1 = params['gamma_l'] * L \
+    + params['gamma_r'] * R \
+    + params['gamma_w'] * W
+
     # lambda_i, as defined above
     lam = lambda_fun(Lb, params['Lmin'], params['Lmax'])
 
     # NPP for each PFT, using the pre-defined sine wave
     Pi = np.array([Pi_t(t), Pi_t(t)])
 
-    # dLb/dt, derived from Eq. 51 (This one is a bit tricky - I am still working on the maths!)
-    dLb_dt = (1 - lam) * Pi / params['sigma1'] \
-             - (params['gamma_l'] + params['gamma_r']) * Lb \
-             - (params['gamma_w'] * W) / params['sigma1']
+    # dLb/dt, derived from Eq. 51
+    numerator = (1 - lam) * Pi - Lambda1
+    denom     = 2 * params['sigma1'] \
+              + params['awl'] * params['bwl'] * Lb**(params['bwl'] - 1)
+
+    dLb_dt = numerator / denom
 
     # dnu/dt, derived from Eq. 52
-    competition = 1 - (params['c'] @ nu)
+    competition = 1 - (params['c'] @ nu)  # matrix multiplication (dot-product)
     dnu_dt = lam * Pi * nu * competition / Cv
 
     return np.concatenate([dLb_dt, dnu_dt])
