@@ -1,34 +1,27 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Simulation settings
+# 1.1 Simulation settings
 days = 10
 dt = 1  # hourly timestep (hours)
 t = np.arange(0, days * 24, dt)  # time in hours
 
-# --- Forcings ---
-# 1. Air temperature: sinusoid, mean 20°C, amplitude ±5°C
-T_mean = 20.0  # °C
-T_amp = 5.0    # °C
+
+# 1.2 Forcings
+
+T_mean = 20.0           # °C - air mean T 20°C
+T_amp = 5.0             # °C - T change amplitude ±5°C
 T = T_mean + T_amp * np.sin(2 * np.pi * t / 24)
-
-# 2. PAR: zero at night, sinusoidal daytime peak ~1500 µmol m⁻² s⁻¹
-I_max = 1500.0  # µmol m⁻² s⁻¹
+I_max = 1500.0          # PAR peak (during the day) µmol m⁻² s⁻¹
 I_par = np.maximum(0.0, I_max * np.sin(np.pi * t / 24))
+P = 101325.0            # surface pressure, Pa
+ca_ppm = 400.0          # ambient CO2 in ppm
+ca = ca_ppm * 1e-6 * P  # ambient CO2 in Pa
+chi = 0.7               # ratio of leaf internal CO2 to ambient CO2
+ci = chi * ca           # leaf internal CO2 in Pa
+O2 = 0.21 * P       # Ambient O2, 21% of total pressure, Pa
 
-# 3. Ambient CO₂ (constant 400 ppm → Pa)
-P = 101325.0        # surface pressure, Pa
-ca_ppm = 400.0      # ppm
-ca = ca_ppm * 1e-6 * P  # convert to Pa
-
-# 4. Leaf internal CO₂ (ci = χ · ca)
-chi = 0.7
-ci = chi * ca       # Pa
-
-# 5. Ambient O₂
-O2 = 0.21 * P       # 21% of total pressure, Pa
-
-# --- PFT parameters for C₃ grass (from Table 2 + eqns) ---
+# 1.3 parameters for C₃ grass (from Table 2) 
 alpha   = 0.12    # quantum efficiency (mol CO₂ mol⁻¹ photon)
 omega   = 0.15    # leaf scattering coefficient
 f_dr    = 0.015   # dark respiration coefficient
@@ -36,25 +29,26 @@ n0      = 0.073   # top-leaf N concentration (kg N per kg C)
 n_e     = 0.0008  # conversion factor: mol CO₂ m⁻² s⁻¹ per kg C
 Vcmax25 = n_e * n0  # base Vcmax at 25°C (mol CO₂ m⁻² s⁻¹)
 
-# Temperature response Q10 values and RuBisCO specificity
+# 1.4 Temperature response Q10 values and RuBisCO specificity
 Q10_Kc = 2.1
 Q10_Ko = 1.2
 Q10_rs = 0.57
 T_low  = 0.0     # lower temp parameter (°C)
 T_upp  = 36.0    # upper temp parameter (°C)
 
-# --- Temperature-dependent parameter calculations ---
+# 2.Equations
+
 # Arrhenius/Q10 factor
 f_T = Q10_Kc ** ((T - 25.0) / 10.0)
 
-# Peaked temperature response for Vcmax
+# Vcmax
 Vcmax = (
     Vcmax25 * f_T
     / ((1.0 + np.exp(0.3 * (T - T_upp)))
        * (1.0 + np.exp(0.3 * (T_low - T))))
 )
 
-# Michaelis-Menten constants at temperature T
+# Michaelis-Menten constants
 Kc = 30.0 * Q10_Kc ** ((T - 25.0) / 10.0)
 Ko = 3e4  * Q10_Ko ** ((T - 25.0) / 10.0)
 
