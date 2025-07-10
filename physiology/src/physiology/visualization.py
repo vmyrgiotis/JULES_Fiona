@@ -30,7 +30,7 @@ def plot_forcings(t, T, I_par, ci, ca):
     plt.plot(t, ci,   label='ci (Pa)')
     #plt.plot(t, O2,   label='O₂ (Pa)')
     plt.axhline(ca, linestyle='--', label='ca (Pa)')
-    plt.title('Full Forcing Time Series')
+    plt.title('Forcing Time Series')
     plt.xlabel('Time (h)')
     plt.ylabel('Value')
     plt.legend()

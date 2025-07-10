@@ -12,9 +12,8 @@ def generate_forcings(settings):
 
     P = settings['P']
     ca = settings['ca_ppm'] * 1e-6 * P
-    ci = np.full_like(t, settings['chi'] * ca)   # make it a full array so that it can be indexed
+    ci = np.full_like(t, settings['chi'] * ca)
     O2 = np.full_like(t, settings['O2_fraction'] * P)
-
     return t, T, I_par, ci, O2
 
 
@@ -25,8 +24,6 @@ def run_simulation(pft_key):
 
     # Generate forcing time series
     t, T, I_par, ci, O2 = generate_forcings(SIM_SETTINGS)
-    print("ci:", type(ci), ci.shape)
-    print("O2:", type(O2), O2.shape)
 
     # Preallocate output
     results = {k: np.zeros_like(t) for k in ['Wc','Wl','We','Rd','Wg','Ap']}
