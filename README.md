@@ -53,6 +53,8 @@ This script will:
    * Time series of `R_b` and `R_se` for selected cells.
    * Catchment-mean critical topographic index (`\lambda_c`) and saturated fraction (`f_sat`).
 
+#  Vegetation Coupler - TRIFFID, RothC and physiology
+
 ---
 
 *Developed by Fiona Fang.*
