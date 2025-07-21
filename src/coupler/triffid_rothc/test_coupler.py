@@ -24,7 +24,6 @@ def test_coupled_model_basic():
         drivers_ts=drivers_ts
     )
     
-    # Basic checks
     assert 'time' in results
     assert 'triffid' in results
     assert 'rothc' in results
