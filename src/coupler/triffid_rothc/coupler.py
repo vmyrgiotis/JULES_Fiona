@@ -1,9 +1,15 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from triffid.triffid import triffid_rhs, params as triffid_params
-from rothc.equations import soil_carbon_rhs
-from rothc.parameters import POOLS, C0_default
+import sys
+from pathlib import Path
+
+src_path = Path(__file__).parent.parent.parent.parent
+sys.path.append(str(src_path))
+
+from src.triffid.triffid import triffid_rhs, params as triffid_params
+from src.rothc.equations import soil_carbon_rhs
+from src.rothc.parameters import POOLS, C0_default
 
 def run_coupled_model(t_span_weeks, initial_conditions):
 
