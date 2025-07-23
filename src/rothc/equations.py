@@ -1,7 +1,7 @@
 # equations.py
 
 import numpy as np
-from parameters import POOLS, kappa, alpha_dr, beta_R, beta_R_default
+from src.rothc.parameters import POOLS, kappa, alpha_dr, beta_R, beta_R_default
 
 def F_T_Q10(T_C, Q10=2.0, T_ref=10.0):
     """Temperature modifier 1: Q10 temperature response (Eq.65)."""

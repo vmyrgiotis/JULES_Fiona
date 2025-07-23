@@ -1,7 +1,13 @@
 import numpy as np
 import pytest
-from ..coupler import run_coupled_model
-from rothc.parameters import POOLS, C0_default
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).parent.parent.parent.parent
+sys.path.append(str(project_root))
+
+from src.coupler.triffid_rothc.coupler import run_coupled_model
+from src.rothc.parameters import POOLS, C0_default
 
 def test_coupled_model_basic():
     triffid_init = [6.0, 3.0, 0.8, 0.2]
@@ -19,12 +25,11 @@ def test_coupled_model_basic():
     }
     
     results = run_coupled_model(
-        t_span=(0, 10),
-        initial_conditions=initial_conditions,
-        drivers_ts=drivers_ts
+        t_span_weeks=(0, 10), 
+        initial_conditions=initial_conditions
     )
     
-    assert 'time' in results
+    assert 'time_weeks' in results   
     assert 'triffid' in results
     assert 'rothc' in results
-    assert results['triffid'].shape[1] == len(results['time'])
+    assert results['triffid'].shape[1] == len(results['time_weeks'])
