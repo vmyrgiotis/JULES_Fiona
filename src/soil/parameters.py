@@ -6,7 +6,7 @@ import numpy as np
 SOIL_LAYERS = {
     'n_layers': 4,
     'depths': np.array([0.1, 0.25, 0.65, 2.0]),      # m, cumulative depth
-    'thickness': np.array([0.1, 0.15, 0.4, 1.35]),   # m, ΔZₖ layer thickness
+    'layer_thickness': np.array([0.1, 0.15, 0.4, 1.35]),   # m, ΔZₖ layer thickness - FIXED KEY NAME
 }
 
 # Soil physical properties (LOAM soil type) 
