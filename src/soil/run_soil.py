@@ -69,20 +69,13 @@ def plot_soil_results(t, theta, T_soil, t_forcing, drivers):
     - drivers: forcing functions
     """
     
-    # Create forcing time series for plotting
     precip_series = [drivers['precipitation'](tt) for tt in t_forcing]
     ET_series = [drivers['evapotranspiration'](tt) for tt in t_forcing]
     T_air_series = [drivers['air_temperature'](tt) for tt in t_forcing]
-    
-    # Convert time to days for plotting
     t_days = t / 24
     t_forcing_days = t_forcing / 24
-    
-    # Layer names for legend
     layer_names = [f"Layer {i+1}" for i in range(theta.shape[0])]
     depths = SOIL_LAYERS['depths']
-    
-    # Create subplots with more spacing
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
     fig.suptitle('JULES Soil Model Results', fontsize=16, y=0.98)  # Move title up slightly
     
