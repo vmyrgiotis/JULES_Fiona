@@ -1,14 +1,26 @@
 # run_physiology.py
 
-from simulation import (
-    run_photosynthesis,
-    run_respiration,
-    run_npp,
-    generate_forcings
-)
-from parameters import SIM_SETTINGS
-import visualization as viz
-import matplotlib.pyplot as plt
+if __name__ == "__main__":
+    from simulation import (
+        run_photosynthesis,
+        run_respiration,
+        run_npp,
+        generate_forcings
+    )
+    from parameters import SIM_SETTINGS
+    import visualization as viz
+    import matplotlib.pyplot as plt
+else:
+    from .simulation import (
+        run_photosynthesis,
+        run_respiration,
+        run_npp,
+        generate_forcings
+    )
+    from .parameters import SIM_SETTINGS
+    import visualization as viz
+    import matplotlib.pyplot as plt
+
 
 if __name__ == '__main__':
     pft = 'needleleaf_tree'

@@ -1,9 +1,14 @@
 #simulation.py
 
 import numpy as np
-from parameters import SIM_SETTINGS, PHOTOSYNTHESIS_PFT_PARAMS, CANOPY_PARAMS, RESPIRATION_PARAMS
-from equations import rate_limiters, big_leaf_photosynthesis, big_leaf_dark_resp, compute_N_pools, maintenance_resp, growth_resp
 
+try: 
+    from parameters import SIM_SETTINGS, PHOTOSYNTHESIS_PFT_PARAMS, CANOPY_PARAMS, RESPIRATION_PARAMS
+    from equations import rate_limiters, big_leaf_photosynthesis, big_leaf_dark_resp, compute_N_pools, maintenance_resp, growth_resp
+except ModuleNotFoundError:
+    from .parameters import SIM_SETTINGS, PHOTOSYNTHESIS_PFT_PARAMS, CANOPY_PARAMS, RESPIRATION_PARAMS
+    from .equations import rate_limiters, big_leaf_photosynthesis, big_leaf_dark_resp, compute_N_pools, maintenance_resp, growth_resp
+    
 def generate_forcings(settings):
     days = settings['days']
     dt = settings['dt_hours']
