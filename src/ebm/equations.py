@@ -1,6 +1,12 @@
 import numpy as np
 
-from parameters import (sigma, rho, c_p, L_v,
+try:
+    from parameters import (sigma, rho, c_p, L_v,
+                        alpha, epsilon_s,
+                        r_a, r_s, r_acap,
+                        lambda_soil, C_surf, C_soil1)
+except (ModuleNotFoundError):
+    from .parameters import (sigma, rho, c_p, L_v,
                         alpha, epsilon_s,
                         r_a, r_s, r_acap,
                         lambda_soil, C_surf, C_soil1)
