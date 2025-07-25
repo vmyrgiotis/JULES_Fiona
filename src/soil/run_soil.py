@@ -49,7 +49,6 @@ def run_soil_model():
         drivers=drivers,
         method="RK45",
         dt_out=dt_hours
-        
     )
     
     # Visualize results
@@ -83,9 +82,9 @@ def plot_soil_results(t, theta, T_soil, t_forcing, drivers):
     layer_names = [f"Layer {i+1}" for i in range(theta.shape[0])]
     depths = SOIL_LAYERS['depths']
     
-    # Create subplots
+    # Create subplots with more spacing
     fig, axes = plt.subplots(2, 2, figsize=(15, 10))
-    fig.suptitle('JULES Soil Model Results', fontsize=16)
+    fig.suptitle('JULES Soil Model Results', fontsize=16, y=0.98)  # Move title up slightly
     
     # Plot 1: Soil moisture profiles
     ax1 = axes[0, 0]
@@ -135,7 +134,8 @@ def plot_soil_results(t, theta, T_soil, t_forcing, drivers):
     ax4.set_title('Air Temperature')
     ax4.grid(True, alpha=0.3)
     
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # Leave space for suptitle
+    plt.subplots_adjust(hspace=0.3, wspace=0.3)  # Add horizontal and vertical spacing
     plt.show()
     
     # Print summary statistics
