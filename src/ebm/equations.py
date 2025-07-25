@@ -1,6 +1,5 @@
-# equations.py
-
 import numpy as np
+
 from parameters import (sigma, rho, c_p, L_v,
                         alpha, epsilon_s,
                         r_a, r_s, r_acap,

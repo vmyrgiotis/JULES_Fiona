@@ -1,8 +1,9 @@
-# simulation_ebm.py
+# simulation.py
 
 import numpy as np
 from scipy.integrate import solve_ivp
 from equations import ebm_rhs
+
 
 def run_ebm(t_span, T0, drivers, method="RK45", dt_out=0.1):
     def rhs(t, T):

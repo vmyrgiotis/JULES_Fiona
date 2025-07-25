@@ -1,15 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import sys, os
+import sys
 from pathlib import Path
 
-src_path = Path(__file__).parent.parent.parent
-src_path = ... / "src"
-sys.path.insert(0, str(src_path))
-
-from src.ebm.run_ebm import run_ebm, drivers as ebm_drivers
-from src.physiology.simulation import generate_forcings, run_npp
-from src.physiology.parameters import SIM_SETTINGS
+from ebm.run_ebm import run_ebm, drivers as ebm_drivers
+from physiology.simulation import generate_forcings, run_npp
+from physiology.parameters import SIM_SETTINGS
 
 
 def main():

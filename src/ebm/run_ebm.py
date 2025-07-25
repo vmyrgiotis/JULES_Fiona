@@ -2,8 +2,15 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from simulation import run_ebm
-from parameters import sigma, epsilon_s
+import sys
+from pathlib import Path
+
+if __name__ == "__main__":
+    from simulation import run_ebm
+    from parameters import sigma, epsilon_s
+else:
+    from .simulation import run_ebm
+    from .parameters import sigma, epsilon_s
 
 def day_fraction(t):
     return (t % 1.0)
