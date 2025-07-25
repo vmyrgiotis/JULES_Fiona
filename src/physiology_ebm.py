@@ -26,7 +26,7 @@ def main():
         days = settings['days']
         dt = settings['dt_hours']
         # build time array
-        t = np.arange(0, days * 24 + dt, dt)
+        t = np.arange(0, days * 24, dt)
         # T in °C for physiology: convert EBM Kelvin to Celsius
         T_leaf_C = Ts_ebm - 273.15
         # reuse other drivers from original generate_forcings for I_par, ci, O2
