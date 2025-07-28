@@ -5,10 +5,7 @@ Main equation: Eq. (53) - Heat conduction with advection
 """
 import numpy as np
 
-try:
-    from thermal_options import simple_thermal_conductivity
-except ModuleNotFoundError:
-    from .thermal_options import simple_thermal_conductivity
+from julesf.soil.thermal_options import simple_thermal_conductivity
 
 def volumetric_heat_capacity(theta, params):
     """

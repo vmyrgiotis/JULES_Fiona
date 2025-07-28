@@ -2,12 +2,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-try:
-    from simulation import generate_soil_forcings, solve_soil_rhs
-    from parameters import SOIL_LAYERS
-except ModuleNotFoundError:
-    from .simulation import generate_soil_forcings, solve_soil_rhs
-    from .parameters import SOIL_LAYERS
+from julesf.soil.simulation import generate_soil_forcings, solve_soil_rhs
+from julesf.soil.parameters import SOIL_LAYERS
 
 def run_soil_model():
     """

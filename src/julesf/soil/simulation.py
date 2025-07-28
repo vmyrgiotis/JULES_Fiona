@@ -2,14 +2,9 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-try:
-    from equations_moisture import moisture_rhs
-    from equations_thermal import thermal_rhs
-    from parameters import SOIL_LAYERS, SOIL_PROPERTIES, VAN_GENUCHTEN, THERMAL_PROPERTIES
-except ModuleNotFoundError:
-    from .equations_moisture import moisture_rhs
-    from .equations_thermal import thermal_rhs
-    from .parameters import SOIL_LAYERS, SOIL_PROPERTIES, VAN_GENUCHTEN, THERMAL_PROPERTIES
+from julesf.soil.equations_moisture import moisture_rhs
+from julesf.soil.equations_thermal import thermal_rhs
+from julesf.soil.parameters import SOIL_LAYERS, SOIL_PROPERTIES, VAN_GENUCHTEN, THERMAL_PROPERTIES
 
 def generate_soil_forcings(days=7, dt_hours=0.5):
     """

@@ -5,10 +5,7 @@ Main equation: Eq. (56) - Richards equation for soil water flow
 """
 import numpy as np
 
-try:
-    from hydraulic_options import simple_hydraulic_conductivity, simple_matric_potential
-except ModuleNotFoundError:
-    from .hydraulic_options import simple_hydraulic_conductivity, simple_matric_potential
+from julesf.soil.hydraulic_options import simple_hydraulic_conductivity, simple_matric_potential
 
 def vertical_water_flux(theta, layer_thickness, params):
     """
