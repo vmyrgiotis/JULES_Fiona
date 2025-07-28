@@ -2,7 +2,8 @@
 
 import numpy as np
 from scipy.integrate import solve_ivp
-from equations import soil_carbon_rhs
+
+from julesf.rothc.equations import soil_carbon_rhs
 
 def run_soil_model(t_span, C0, drivers_ts,
                    texture="loam", temp_fun="Q10",
