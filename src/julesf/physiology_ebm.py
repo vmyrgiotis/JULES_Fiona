@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
 
-from ebm.run_ebm import run_ebm, drivers as ebm_drivers
-from physiology.simulation import generate_forcings, run_npp
-from physiology.parameters import SIM_SETTINGS
+from julesf.ebm.run_ebm import run_ebm, drivers as ebm_drivers
+from julesf.physiology.simulation import generate_forcings, run_npp
+from julesf.physiology.parameters import SIM_SETTINGS
 
 
 def main():

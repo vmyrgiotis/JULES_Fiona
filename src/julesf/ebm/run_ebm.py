@@ -47,16 +47,16 @@ def Q1(t, RH=0.6):
 def nu(t, nu_mean=0.8):
     return nu_mean
 
-def main():
+drivers = {
+    "Sdn":   Sdn,
+    "Ldn":   Ldn,
+    "Tair":  Tair,
+    "Q1":    Q1,
+    "nu":    nu,
+    "Tsoil": Tsoil,
+}
 
-    drivers = {
-        "Sdn":   Sdn,
-        "Ldn":   Ldn,
-        "Tair":  Tair,
-        "Q1":    Q1,
-        "nu":    nu,
-        "Tsoil": Tsoil,
-    }
+def main():
 
     t_span = (0, 10)
     T0 = 283.0
