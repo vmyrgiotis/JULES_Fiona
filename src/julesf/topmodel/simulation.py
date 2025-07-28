@@ -1,5 +1,5 @@
 import numpy as np
-from equation import (
+from julesf.topmodel.equation import (
     compute_transmissivity, compute_baseflow,
     compute_lambda_c, compute_f_sat, update_water_table
 )

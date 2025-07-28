@@ -1,5 +1,5 @@
-from simulation import simulate_topmodel
-from visualization import plot_runoff, plot_intermediates
+from julesf.topmodel.simulation import simulate_topmodel
+from julesf.topmodel.visualization import plot_runoff, plot_intermediates
 
 if __name__ == "__main__":
     t, lambda_bar, W0, z_bar, Rb, lambda_c, f_sat, Rse = simulate_topmodel()
