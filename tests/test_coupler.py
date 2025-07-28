@@ -3,11 +3,8 @@ import pytest
 import sys
 from pathlib import Path
 
-project_root = Path(__file__).parent.parent.parent.parent
-sys.path.append(str(project_root))
-
-from src.coupler.triffid_rothc.coupler import run_coupled_model
-from src.rothc.parameters import POOLS, C0_default
+from julesf.coupler.triffid_rothc.coupler import run_coupled_model
+from julesf.rothc.parameters import POOLS, C0_default
 
 def test_coupled_model_basic():
     triffid_init = [6.0, 3.0, 0.8, 0.2]

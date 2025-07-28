@@ -1,6 +1,7 @@
-from coupler.triffid_rothc.coupler import run_coupled_model
-from rothc.parameters import POOLS, C0_default
 import matplotlib.pyplot as plt
+
+from julesf.coupler.triffid_rothc.coupler import run_coupled_model
+from julesf.rothc.parameters import POOLS, C0_default
 
 def main():
     # Setup initial conditions
