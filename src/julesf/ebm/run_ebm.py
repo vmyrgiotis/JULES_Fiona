@@ -4,13 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 from pathlib import Path
-
-if __name__ == "__main__":
-    from simulation import run_ebm
-    from parameters import sigma, epsilon_s
-else:
-    from .simulation import run_ebm
-    from .parameters import sigma, epsilon_s
+    
+from julesf.ebm.simulation import run_ebm
+from julesf.ebm.parameters import sigma, epsilon_s
 
 def day_fraction(t):
     return (t % 1.0)
@@ -51,28 +47,34 @@ def Q1(t, RH=0.6):
 def nu(t, nu_mean=0.8):
     return nu_mean
 
+def main():
 
-drivers = {
-    "Sdn":   Sdn,
-    "Ldn":   Ldn,
-    "Tair":  Tair,
-    "Q1":    Q1,
-    "nu":    nu,
-    "Tsoil": Tsoil,
-}
+    drivers = {
+        "Sdn":   Sdn,
+        "Ldn":   Ldn,
+        "Tair":  Tair,
+        "Q1":    Q1,
+        "nu":    nu,
+        "Tsoil": Tsoil,
+    }
 
-t_span = (0, 10)
-T0 = 283.0
+    t_span = (0, 10)
+    T0 = 283.0
 
-t, Ts = run_ebm(t_span, T0, drivers, dt_out=0.05)
+    t, Ts = run_ebm(t_span, T0, drivers, dt_out=0.05)
 
-plt.figure(figsize=(8,4))
-plt.plot(t, Ts, label="T_surf")
-plt.plot(t, [drivers["Tair"](tt) for tt in t], '--', label="T_air")
-plt.plot(t, [drivers["Tsoil"](tt) for tt in t], ':', label="T_soil")
-plt.xlabel("Time (days)")
-plt.ylabel("Temperature (K)")
-plt.legend()
-plt.title("Surface EBM (surface heat capacity = 2.0e3 J m⁻² K⁻¹)")
-plt.tight_layout()
-plt.show()
+    plt.figure(figsize=(8,4))
+    plt.plot(t, Ts, label="T_surf")
+    plt.plot(t, [drivers["Tair"](tt) for tt in t], '--', label="T_air")
+    plt.plot(t, [drivers["Tsoil"](tt) for tt in t], ':', label="T_soil")
+    plt.xlabel("Time (days)")
+    plt.ylabel("Temperature (K)")
+    plt.legend()
+    plt.title("Surface EBM (surface heat capacity = 2.0e3 J m⁻² K⁻¹)")
+    plt.tight_layout()
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
+

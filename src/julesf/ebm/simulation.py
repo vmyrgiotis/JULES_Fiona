@@ -6,10 +6,7 @@ import sys
 from pathlib import Path
 
 # Try local import first, if fails use relative import (worked)
-try:
-    from equations import ebm_rhs
-except (ModuleNotFoundError):
-    from .equations import ebm_rhs
+from julesf.ebm.equations import ebm_rhs
 
 
 

@@ -1,15 +1,9 @@
 import numpy as np
 
-try:
-    from parameters import (sigma, rho, c_p, L_v,
-                        alpha, epsilon_s,
-                        r_a, r_s, r_acap,
-                        lambda_soil, C_surf, C_soil1)
-except (ModuleNotFoundError):
-    from .parameters import (sigma, rho, c_p, L_v,
-                        alpha, epsilon_s,
-                        r_a, r_s, r_acap,
-                        lambda_soil, C_surf, C_soil1)
+from julesf.ebm.parameters import (sigma, rho, c_p, L_v,
+                    alpha, epsilon_s,
+                    r_a, r_s, r_acap,
+                    lambda_soil, C_surf, C_soil1)
 
 def H_flux(T_surf, T_air):
     """Sensible heat flux (Eq. 2)."""
