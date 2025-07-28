@@ -1,25 +1,14 @@
 # run_physiology.py
+import matplotlib.pyplot as plt
 
-if __name__ == "__main__":
-    from simulation import (
+from julesf.physiology.parameters import SIM_SETTINGS
+from julesf.physiology.simulation import (
         run_photosynthesis,
         run_respiration,
         run_npp,
         generate_forcings
     )
-    from parameters import SIM_SETTINGS
-    import visualization as viz
-    import matplotlib.pyplot as plt
-else:
-    from .simulation import (
-        run_photosynthesis,
-        run_respiration,
-        run_npp,
-        generate_forcings
-    )
-    from .parameters import SIM_SETTINGS
-    import visualization as viz
-    import matplotlib.pyplot as plt
+import julesf.physiology.visualization as viz
 
 
 if __name__ == '__main__':
