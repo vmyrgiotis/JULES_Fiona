@@ -22,7 +22,7 @@ This folder contains a lightweight Python implementation of the Joint UK Land En
    python -m venv venv
    source venv/bin/activate     # Unix/macOS
    venv\Scripts\activate        # Windows
-   pip install numpy matplotlib
+   pip install numpy matplotlib scipy
    ```
 
 # TOPMODEL Prototype

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "julesf"
+version = "0.1.0"
+description = "A Python implementation of the JULES land surface model by Fiona."
+authors = [
+  { name = "fionazfang", email = "xxxxxxxxxxx.fionazfang@users.noreply.github.com" },
+]
+readme = "README.md"
+license = "TODO"
+requires-python = ">=3.13"
+dependencies = [
+  "numpy",
+  "matplotlib",
+  "scipy",
+]
+
+
