@@ -7,6 +7,7 @@ This folder contains a lightweight Python implementation of the Joint UK Land En
 * Python 3.7+
 * NumPy
 * Matplotlib
+* Pandas
 * SciPy
 
 # Installation
@@ -22,7 +23,7 @@ This folder contains a lightweight Python implementation of the Joint UK Land En
    python -m venv venv
    source venv/bin/activate     # Unix/macOS
    venv\Scripts\activate        # Windows
-   pip install numpy matplotlib
+   pip install numpy matplotlib scipy
    ```
 
 # TOPMODEL Prototype
