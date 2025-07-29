@@ -4,8 +4,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from simulation import run_soil_model
-from parameters import POOLS, C0_default
+if __name__ == "__main__":
+    from simulation import run_soil_model
+    from parameters import POOLS, C0_default
+else:
+    from .simulation import run_soil_model
+    from .parameters import POOLS, C0_default
 
 def seasonal_temp(t):   # in °C
     return 10.0 + 10.0*np.sin(2*np.pi*t/365)
