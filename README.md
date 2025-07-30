@@ -31,6 +31,7 @@ The **julesf** package implements key components of the JULES land‐surface mod
 Each module is designed for standalone use via dedicated `run_*` scripts. The coupled simulations leverage SciPy’s IVP solvers for robust numerical integration across the interconnected processes.
 
 ![JULES Mindmap](docs/img/jules_mindmap.png)
+*Figure: A conceptual framework of the coupled land‐surface processes implemented in julesf. Created by Fiona (Ziyan) Fang.*
 
 
 ## Project Structure
