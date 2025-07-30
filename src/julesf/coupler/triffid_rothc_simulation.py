@@ -1,23 +1,20 @@
-"""
-TRIFFID-RothC Coupled Simulation - Minimal Version
-Fixed dimension and bounds issues
-"""
 import numpy as np
 
-from julesf.triffid.run_triffid import triffid_rhs, params as triffid_params
+# Updated imports for new TRIFFID structure
+from julesf.triffid.equations import triffid_rhs
+from julesf.triffid.parameters import PFT_PARAMS
 from julesf.rothc.equations import soil_carbon_rhs
 from julesf.rothc.run_rothc import seasonal_temp, seasonal_moisture
 
 def solve_triffid_rothc_euler(t_span, triffid_init, rothc_init, dt=1.0):
     """
     Euler integration for TRIFFID-RothC coupling
-    Fixed array dimensions and bounds checking
     """
     t0, tf = t_span
     n_steps = int((tf - t0) / dt) + 1
-    t = np.linspace(t0, tf, n_steps)  # Use linspace for exact dimensions
+    t = np.linspace(t0, tf, n_steps)
     
-    # Pre-allocate - match time array length exactly
+    # Pre-allocate
     triffid_out = np.zeros((4, n_steps))
     rothc_out = np.zeros((4, n_steps))
     litterfall = np.zeros(n_steps)
@@ -27,32 +24,42 @@ def solve_triffid_rothc_euler(t_span, triffid_init, rothc_init, dt=1.0):
     triffid_out[:, 0] = triffid_init
     rothc_out[:, 0] = rothc_init
     litterfall[0] = 0.0
-    veg_cover[0] = triffid_init[2] + triffid_init[3]  # Initial cover
+    veg_cover[0] = triffid_init[2] + triffid_init[3]
+    
+    # Prepare TRIFFID parameters in the format expected by triffid_rhs
+    params_combined = {**PFT_PARAMS, 'competition': {'c': np.array([[1.0, 1.0], [0.0, 1.0]])}}
     
     for i in range(1, n_steps):
         t_curr = t[i-1]
         
-        # TRIFFID step with bounds checking
+        # TRIFFID step 
         triffid_state = triffid_out[:, i-1]
-        dtriffid_dt = triffid_rhs(t_curr, triffid_state)
+        dtriffid_dt = triffid_rhs(t_curr, triffid_state, params_combined, npp_external=None)
         new_triffid = triffid_state + dt * dtriffid_dt
         
-        # Apply bounds to prevent negative LAI (fixes power warning)
-        new_triffid[0] = max(0.01, new_triffid[0])  # Lb_tree >= 0.01
-        new_triffid[1] = max(0.01, new_triffid[1])  # Lb_grass >= 0.01
-        new_triffid[2] = max(0, min(1, new_triffid[2]))  # nu_tree in [0,1]
-        new_triffid[3] = max(0, min(1, new_triffid[3]))  # nu_grass in [0,1]
+        # Apply bounds
+        new_triffid[0] = max(0.01, new_triffid[0])
+        new_triffid[1] = max(0.01, new_triffid[1])
+        new_triffid[2] = max(0, min(1, new_triffid[2]))
+        new_triffid[3] = max(0, min(1, new_triffid[3]))
         
         triffid_out[:, i] = new_triffid
         
-        # Extract coupling variables
+        # Extract coupling variables 
         Lb_tree, Lb_grass = new_triffid[0], new_triffid[1]
         nu_tree, nu_grass = new_triffid[2], new_triffid[3]
         
-        # Litterfall coupling
-        L_tree = triffid_params['sigma1'][0] * Lb_tree
-        L_grass = triffid_params['sigma1'][1] * Lb_grass
-        Lambda_c = triffid_params['gamma_l'][0] * (L_tree + L_grass) * 0.01
+        # Litterfall coupling 
+        sigma1_tree = PFT_PARAMS['broadleaf_tree']['sigma1']
+        sigma1_grass = PFT_PARAMS['C3_grass']['sigma1']
+        gamma_l_tree = PFT_PARAMS['broadleaf_tree']['gamma_l']
+        gamma_l_grass = PFT_PARAMS['C3_grass']['gamma_l']
+        
+        L_tree = sigma1_tree * Lb_tree
+        L_grass = sigma1_grass * Lb_grass
+        Lambda_c = gamma_l_tree * L_tree + gamma_l_grass * L_grass  # kg C m⁻² yr⁻¹
+        Lambda_c = Lambda_c / 365.25  # Convert to daily rate for coupling
+        
         nu_total = max(0, min(1, nu_tree + nu_grass))
         
         litterfall[i] = Lambda_c

@@ -1,6 +1,3 @@
-"""
-TRIFFID-RothC Coupled Model - Minimal Runner
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 
