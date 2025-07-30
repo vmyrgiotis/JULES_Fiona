@@ -1,61 +1,106 @@
-# JULES Prototype
+# julesf
 
-This folder contains a lightweight Python implementation of the Joint UK Land Environment Simulator (JULES) developed by Fiona Fang.
+A Python implementation of the JULES land-surface model components (Best et al. 2011; Clark et al. 2011) developed by Fiona (Ziyan) Fang.  
+Designed for easy standalone use and modular coupling via SciPy IVP solvers.
 
-# Dependencies
+## Overview
 
-* Python 3.7+
-* NumPy
-* Matplotlib
-* Pandas
-* SciPy
+The **julesf** package implements key components of the JULES land‐surface model, encapsulating the following processes:
 
-# Installation
 
-1. Clone the repository:
+- **Energy Balance Model (EBM)**:  
+  Simulates surface energy exchange, including net radiation, sensible and latent heat fluxes.
 
-   ```bash
-   git clone https://fionazfang/JULES_Fiona.git
-   ```
-2. Create a virtual environment and install dependencies:
+- **Plant Physiology**:  
+  Models photosynthesis and respiration via a Farquhar-type scheme, integrating diurnal and seasonal variations in environmental drivers. First computes the leaf-level physiologyand then scales up to canopy-level.
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate     # Unix/macOS
-   venv\Scripts\activate        # Windows
-   pip install numpy matplotlib scipy
-   ```
+- **Soil Moisture and Thermodynamics**:  
+  Implements a multi‐layer formulation of the Richards equation for soil moisture dynamics, coupled with heat conduction and thermodynamic equations to capture subsurface temperature profiles. Provides multiple options for computing soil hydraulic and thermal properties.
 
-# TOPMODEL Prototype
+- **Vegetation Competition (TRIFFID)**:  
+  Represents dynamic vegetation responses (e.g., LAI, fractional cover) and allometric relationships, following Clark et al. (2011).
 
-## Structure
+
+- **Soil Carbon Module (RothC)**:  
+  Simulates soil carbon turnover across multiple pools (DPM, RPM, BIO, HUM), with decomposition rates modulated by soil moisture and temperature.
+
+- **Couplers**:  
+  Provides interfaces for integrating the standalone modules (e.g., Physiology-EBM and TRIFFID-RothC), enabling controlled exchange of key variables such as litterfall, canopy cover, and water fluxes.
+  (TODO: finish the coupler for the whole JULES model.)
+
+Each module is designed for standalone use via dedicated `run_*` scripts. The coupled simulations leverage SciPy’s IVP solvers for robust numerical integration across the interconnected processes.
+
+![JULES Mindmap](docs/img/jules_mindmap.png)
+
+
+## Project Structure
 
 ```
-topmodel/  
-├── equation.py        # Core physics routines (transmissivity, baseflow, etc.)  
-├── simulation.py      # Simulation driver: sets up inputs, runs time-stepping  
-├── visualization.py   # Visualization functions (plots of runoff and intermediates)  
-└── run_topmodel.py    # Entry-point script: runs simulation and generates plots
+src/julesf/
+├── soil/
+│   ├── parameters.py
+│   ├── hydraulic_options.py
+│   ├── equations_moisture.py
+│   ├── equations_thermal.py
+│   ├── simulation.py
+│   └── run_soil.py
+├── ebm/
+│   ├── parameters.py
+│   ├── equations.py
+│   ├── simulation.py
+│   └── run_ebm.py
+├── physiology/
+│   ├── parameters.py
+│   ├── equations.py
+│   ├── simulation.py
+│   ├── visualization.py
+│   └── run_physiology.py
+├── triffid/
+│   ├── triffid.py
+│   └── run_triffid.py
+├── rothc/
+│   ├── parameters.py
+│   ├── equations.py
+│   ├── simulation.py
+│   └── run_rothc.py
+├── topmodel/
+│   ├── equation.py
+│   ├── simulation.py
+│   └── run_topmodel.py
+└── coupler/
+    ├── physiology_ebm.py
+    ├── triffid_rothc/
+    │   └── coupler.py
+    └── examples/
+        └── run_coupled_model.py
+```
+
+## Installation
+
+```bash
+git clone https://github.com/your-org/JULES_Fiona.git
+cd JULES_Fiona
+python -m pip install -e .
 ```
 
 ## Usage
 
-Run the model and visualize results by executing:
+### Standalone modules
 
 ```bash
-python run_topmodel.py
+python -m julesf.soil.run_soil
+python -m julesf.ebm.run_ebm
+python -m julesf.physiology.run_physiology
+python -m julesf.triffid.run_triffid
+python -m julesf.rothc.run_rothc
+python -m julesf.topmodel.run_topmodel
 ```
 
-This script will:
+### Coupled examples
 
-1. Simulate a 5×5 grid over one year (daily time-step) of baseflow (`R_b`) and saturation-excess runoff (`R_se`).
-2. Produce two figures:
+```bash
+python -m julesf.physiology_ebm
+python -m julesf.coupler.examples.run_coupled_model
+```
 
-   * Time series of `R_b` and `R_se` for selected cells.
-   * Catchment-mean critical topographic index (`\lambda_c`) and saturated fraction (`f_sat`).
-
-#  Vegetation Coupler - TRIFFID, RothC and physiology
-
----
-
-*Developed by Fiona Fang.*
+TODO: See docstrings for precise equation numbers and units.
