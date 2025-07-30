@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     viz.plot_forcings(t_forc, T, I_par, ci, ca)
     viz.plot_limiters(t, ps)                             # Wc, Wl, We
-    viz.plot_photosynthesis(t, ps)                               # Wg, Rd, Ap, Ac
+    viz.plot_photosynthesis(t, ps)                       # Wg, Rd, Ap, Ac
     viz.plot_respiration(t, resp)                        # R_dc, Pi_G, R_pm, R_pg, R_p
     viz.plot_npp(t, npp)                                 # Pi_net
 

@@ -5,7 +5,8 @@ def temperature_response(T, Vcmax25, Q10_Kc, T_low, T_upp):
     """
     Equation 4, 5
     """
-    f_T = Q10_Kc ** ((T - 25.0) / 10.0)
+    T_ref = 298.15
+    f_T = Q10_Kc ** ((T - T_ref) / 10.0)
     denom = (1.0 + np.exp(0.3 * (T - T_upp))) * (1.0 + np.exp(0.3 * (T_low - T)))
     return Vcmax25 * f_T / denom
 
@@ -14,8 +15,9 @@ def michaelis_constants(T, Q10_Kc, Q10_Ko):
     """
     Equation 9, 10
     """
-    Kc = 30.0 * Q10_Kc ** ((T - 25.0) / 10.0)
-    Ko = 3e4  * Q10_Ko ** ((T - 25.0) / 10.0)
+    T_ref = 298.15
+    Kc = 30.0 * Q10_Kc ** ((T - T_ref) / 10.0)
+    Ko = 3e4  * Q10_Ko ** ((T - T_ref) / 10.0)
     return Kc, Ko
 
 
@@ -23,7 +25,8 @@ def compensation_point(T, O2, Q10_rs):
     """
     Γ, the CO2 compensation point, Equation 7, 8
     """
-    tau = 2600.0 * Q10_rs ** ((T - 25.0) / 10.0)
+    T_ref = 298.15
+    tau = 2600.0 * Q10_rs ** ((T - T_ref) / 10.0)
     return O2 / (2.0 * tau)
 
 
