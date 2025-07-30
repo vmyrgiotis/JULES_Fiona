@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-from julesf.coupler.triffid_rothc.coupler import run_coupled_model
+from julesf.coupler.coupler import run_coupled_model
 from julesf.rothc.parameters import POOLS, C0_default
 
 def main():
