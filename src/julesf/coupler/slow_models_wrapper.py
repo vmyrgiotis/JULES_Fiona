@@ -39,10 +39,10 @@ def run_slow_models_week(fast_results, triffid_state, rothc_state, week_num=0):
     
     # 6. Run RothC
     rothc_drivers = {
-        'T_soil': lambda t: T_soil_mean,
-        's': lambda t: s,
-        'nu': lambda t: nu_total,
-        'Lambda_c': lambda t: litterfall,
+        'T_soil': T_soil_mean,
+        's': s,
+        'nu': nu_total,
+        'Lambda_c': litterfall,
     }
     
     t = week_num * 7  # Current time in days
