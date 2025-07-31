@@ -8,18 +8,6 @@ from julesf.rothc.parameters import POOLS, C0_default
 from julesf.soil.parameters import SOIL_LAYERS, INITIAL_CONDITIONS
 
 def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None):
-    """
-    Run coupled JULES model for specified number of weeks
-    
-    Args:
-        weeks: Number of weeks to run
-        triffid_init: Optional initial TRIFFID state [Lb_tree, Lb_grass, nu_tree, nu_grass]
-        rothc_init: Optional initial RothC state [C_dpm, C_rpm, C_bio, C_hum]
-        soil_init: Optional initial soil state {'theta': [...], 'T_soil': [...]}
-    
-    Returns:
-        Dict with full simulation results
-    """
     start_time = time.time()
     
     # Initialize model states

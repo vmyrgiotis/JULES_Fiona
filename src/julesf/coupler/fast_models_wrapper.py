@@ -54,6 +54,10 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
     # 5. Compute integrated NPP
     npp_mean = np.mean(npp['Pi_net'])  # μmol CO₂ m⁻² s⁻¹
     npp_for_triffid = convert_npp_to_carbon(npp_mean, days * 24)
+
+    Pi_G_mean = np.mean(npp.get('Pi_G', npp['Pi_net']))  # Gross photosynthesis
+    R_p_mean = np.mean(npp.get('R_p', 0))                # Plant respiration
+    
     
     # 6. Return results
     return {
@@ -61,6 +65,8 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
         'soil_theta': soil_results['theta'],  # m³/m³, time series  
         'soil_T': soil_results['T_soil'],     # K, time series
         'NPP_total': npp_for_triffid,         # kg C m⁻² week⁻¹
+        'Pi_G': Pi_G_mean,                    # μmol CO₂ m⁻² s⁻¹
+        'R_p': R_p_mean,                      # μmol CO₂ m⁻² s⁻¹
         'soil_final': {                       # Final states for next week
             'theta': soil_results['theta'][:, -1],
             'T_soil': soil_results['T_soil'][:, -1]
