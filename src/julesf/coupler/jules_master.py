@@ -5,6 +5,7 @@ from julesf.coupler.fast_models_wrapper import run_fast_models_week
 from julesf.coupler.slow_models_wrapper import run_slow_models_week
 from julesf.coupler.coupling_utils import extract_vegetation_vars
 from julesf.rothc.parameters import POOLS, C0_default
+from julesf.soil.parameters import SOIL_LAYERS, INITIAL_CONDITIONS
 
 def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None):
     """
@@ -24,7 +25,16 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
     # Initialize model states
     triffid_state = triffid_init if triffid_init is not None else [6.0, 3.0, 0.8, 0.2]
     rothc_state = rothc_init if rothc_init is not None else [C0_default[p] for p in POOLS]
-    soil_state = soil_init if soil_init is not None else None
+    
+    # Build default soil state if none provided
+    if soil_init is None:
+        n = SOIL_LAYERS['n_layers']
+        soil_state = {
+            'theta': np.full(n, INITIAL_CONDITIONS['theta_init']),
+            'T_soil': np.full(n, INITIAL_CONDITIONS['T_init'])
+        }
+    else:
+        soil_state = soil_init
     
     # Pre-allocate storage arrays for results
     results = {

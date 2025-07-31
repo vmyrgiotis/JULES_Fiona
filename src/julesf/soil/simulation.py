@@ -69,7 +69,7 @@ def soil_rhs(t, y, params, drivers):
     t_seconds = t * 3600
     dtheta_dt = moisture_rhs(theta, T_soil, params, drivers, t)
     
-    from equations_moisture import vertical_water_flux, infiltration_rate
+    from .equations_moisture import vertical_water_flux, infiltration_rate
     W_flux = vertical_water_flux(theta, params['layer_thickness'], params)
     W_flux[0] = infiltration_rate(params, drivers, t)
     
@@ -88,7 +88,7 @@ def soil_rhs(t, y, params, drivers):
 
 def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="RK45", dt_out=0.5):
     """
-    Core IVP solver for coupled soil moisture-thermal system
+    IVP solver for coupled soil moisture-thermal system
     
     Parameters:
     - t_span:     time span (start, end) in hours

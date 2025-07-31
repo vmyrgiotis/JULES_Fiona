@@ -6,7 +6,7 @@ from scipy.integrate import solve_ivp
 
 from julesf.ebm.run_ebm import run_ebm, drivers as ebm_drivers
 from julesf.physiology.simulation import run_npp
-from julesf.soil.run_soil import run_soil_model
+from julesf.soil.simulation import solve_soil_rhs
 from julesf.coupler.coupling_utils import convert_npp_to_carbon
 
 def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
@@ -44,12 +44,18 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
         'ET': lambda t: 5e-6,      # kg/m²/s, placeholder
     }
     
-    soil_results = run_soil_model(
-        t_span, 
-        soil_initial['theta'] if soil_initial else None,
-        soil_initial['T_soil'] if soil_initial else None,
-        soil_drivers
+    # solve soil moisture & thermal ODEs over one week (hours)
+    t_soil, theta_ts, T_ts = solve_soil_rhs(
+        t_span=(0, days*24),              # span in hours
+        theta_init=soil_initial['theta'] if soil_initial else None,
+        T_init=soil_initial['T_soil'] if soil_initial else None,
+        drivers=soil_drivers,
+        dt_out=dt_hours                   # output every dt_hours
     )
+    soil_results = {
+        'theta': theta_ts,                # n_layers × n_times
+        'T_soil': T_ts                    # n_layers × n_times
+    }
     
     # 5. Compute integrated NPP
     npp_mean = np.mean(npp['Pi_net'])  # μmol CO₂ m⁻² s⁻¹
