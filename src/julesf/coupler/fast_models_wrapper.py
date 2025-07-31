@@ -10,21 +10,10 @@ from julesf.soil.simulation import solve_soil_rhs
 from julesf.coupler.coupling_utils import convert_npp_to_carbon
 
 def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
-    """
-    Run EBM + Soil + Physiology for 1 week at 0.5h timestep
-    
-    Args:
-        nu_cover: Total vegetation cover fraction
-        LAI_total: Total leaf area index
-        soil_initial: Dict with theta and T_soil arrays
-        week_num: Week number for seasonal forcing
-        
-    Returns:
-        Dict with results and final states
-    """
+    """Run EBM + Soil + Physiology for 1 week at 0.5h timestep"""
     days = 7
     dt_hours = 0.5
-    t_span = (week_num * 7, week_num * 7 + days)  # days
+    t_span = (0, days)  # Always 0-7 days for each week
     
     # 1. Setup EBM with soil feedbacks
     ebm_drivers_mod = ebm_drivers.copy()
