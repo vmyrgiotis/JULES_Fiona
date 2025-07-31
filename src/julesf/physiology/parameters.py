@@ -83,8 +83,8 @@ RESPIRATION_PARAMS = {
 }
 
 SIM_SETTINGS = {
-    'days':         10,
-    'dt_hours':     1,
+    'days':         7,
+    'dt_hours':     0.5,
     'T_mean':       293.15,       # K, mean temperature (20°C)
     'T_amp':        5.0,          # K, temperature amplitude 
     'I_max':        1500.0,       # μmol m⁻² s⁻¹, maximum PAR
