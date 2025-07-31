@@ -25,8 +25,7 @@ The **julesf** package implements key components of the JULES land‐surface mod
   Simulates soil carbon turnover across multiple pools (DPM, RPM, BIO, HUM), with decomposition rates modulated by soil moisture and temperature.
 
 - **Couplers**:  
-  Provides interfaces for integrating the standalone modules (e.g., Physiology-EBM and TRIFFID-RothC), enabling controlled exchange of key variables such as litterfall, canopy cover, and water fluxes.
-  (TODO: finish the coupler for the whole JULES model.)
+  Provides a multi-timescale coupling framework interfaces for integrating all standalone modules, enabling controlled exchange of key variables such as litterfall, canopy cover, and water fluxes.
 
 Each module is designed for standalone use via dedicated `run_*` scripts. The coupled simulations leverage SciPy’s IVP solvers for robust numerical integration across the interconnected processes.
 
@@ -40,7 +39,6 @@ Each module is designed for standalone use via dedicated `run_*` scripts. The co
 src/julesf/
 ├── soil/
 │   ├── parameters.py
-│   ├── hydraulic_options.py
 │   ├── equations_moisture.py
 │   ├── equations_thermal.py
 │   ├── simulation.py
@@ -57,7 +55,9 @@ src/julesf/
 │   ├── visualization.py
 │   └── run_physiology.py
 ├── triffid/
-│   ├── triffid.py
+│   ├── parameters.py
+│   ├── equations.py
+│   ├── simulation.py
 │   └── run_triffid.py
 ├── rothc/
 │   ├── parameters.py
@@ -65,12 +65,16 @@ src/julesf/
 │   ├── simulation.py
 │   └── run_rothc.py
 ├── topmodel/
-│   ├── equation.py
+│   ├── equations.py
 │   ├── simulation.py
 │   └── run_topmodel.py
 └── coupler/
-    ├── physiology_ebm.py
-    ├── triffid_rothc/
+    ├── jules_master.py          # Main multi-timescale orchestrator
+    ├── fast_models_wrapper.py   # EBM + Soil + Physiology (0.5h)
+    ├── slow_models_wrapper.py   # TRIFFID + RothC         (weekly)
+    ├── coupling_utils.py        # Unit conversions & utilities
+    ├── diagnostics.py           # Coupling validation tools
+    ├── triffid_rothc/           # Legacy pairwise couplers
     │   └── coupler.py
     └── examples/
         └── run_coupled_model.py
@@ -100,8 +104,7 @@ python -m julesf.topmodel.run_topmodel
 ### Coupled examples
 
 ```bash
-python -m julesf.physiology_ebm
-python -m julesf.coupler.examples.run_coupled_model
+python -m julesf.coupler.jules_master
 ```
 
 TODO: See docstrings for precise equation numbers and units.
