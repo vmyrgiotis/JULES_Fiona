@@ -13,7 +13,9 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
     """Run EBM + Soil + Physiology for 1 week at 0.5h timestep"""
     days = 7
     dt_hours = 0.5
-    t_span = (0, days)  # Always 0-7 days for each week
+    t_span = (0, days)
+    
+    print(f"Week {week_num+1}: Running fast models (EBM+Soil+Physiology)...")
     
     # 1. Setup EBM with soil feedbacks
     ebm_drivers_mod = ebm_drivers.copy()
@@ -33,14 +35,17 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
         'ET': lambda t: 5e-6,      # kg/m²/s, placeholder
     }
     
-    # solve soil moisture & thermal ODEs over one week (hours)
     t_soil, theta_ts, T_ts = solve_soil_rhs(
-        t_span=(0, days*24),              # span in hours
+        t_span=(0, days*24),
         theta_init=soil_initial['theta'] if soil_initial else None,
         T_init=soil_initial['T_soil'] if soil_initial else None,
         drivers=soil_drivers,
-        dt_out=dt_hours                   # output every dt_hours
+        dt_out=dt_hours
     )
+    print("Simulation completed successfully!")
+    print(f"Final moisture range: {theta_ts.min():.3f} - {theta_ts.max():.3f} m³/m³")
+    print(f"Final temperature range: {T_ts.min():.1f} - {T_ts.max():.1f} K")
+    
     soil_results = {
         'theta': theta_ts,                # n_layers × n_times
         'T_soil': T_ts                    # n_layers × n_times
