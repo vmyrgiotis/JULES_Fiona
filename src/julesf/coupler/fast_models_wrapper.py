@@ -42,7 +42,6 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0):
         drivers=soil_drivers,
         dt_out=dt_hours
     )
-    print("Simulation completed successfully!")
     print(f"Final moisture range: {theta_ts.min():.3f} - {theta_ts.max():.3f} m³/m³")
     print(f"Final temperature range: {T_ts.min():.1f} - {T_ts.max():.1f} K")
     

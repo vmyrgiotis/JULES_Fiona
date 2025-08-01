@@ -7,7 +7,7 @@ from julesf.coupler.coupling_utils import extract_vegetation_vars
 from julesf.rothc.parameters import POOLS, C0_default
 from julesf.soil.parameters import SOIL_LAYERS, INITIAL_CONDITIONS
 
-def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None):
+def jules_master_coupler(weeks=1400, triffid_init=None, rothc_init=None, soil_init=None):
     start_time = time.time()
     
     # Initialize model states
@@ -122,7 +122,8 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
         results['weekly']['soil_moisture_mean'][week] = np.mean(fast_results['soil_theta'][0, :])
         results['weekly']['soil_temp_mean'][week] = np.mean(fast_results['soil_T'][0, :])
         
-        print(f"Week {week+1:2d}: NPP={fast_results['NPP_total']:.4f} kg C/m²/wk, "
+        print(f"Week {week+1:2d}: Running slow models (TRIFFID + RothC)... ")
+        print(f"NPP={fast_results['NPP_total']:.4f} kg C/m²/wk, "
               f"θ={results['weekly']['soil_moisture_mean'][week]:.3f} m³/m³, "
               f"T={results['weekly']['soil_temp_mean'][week]-273.15:.1f}°C, "
               f"LAI={veg_vars['LAI_total']:.2f}")
@@ -134,10 +135,10 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
 
 def run_jules_simulation(config=None):
     if config is None:
-        config = {'weeks': 52}
+        config = {'weeks': 1400}
         
     results = jules_master_coupler(
-        weeks=config.get('weeks', 52),
+        weeks=config.get('weeks', 1400),
         triffid_init=config.get('triffid_init'),
         rothc_init=config.get('rothc_init'),
         soil_init=config.get('soil_init')
