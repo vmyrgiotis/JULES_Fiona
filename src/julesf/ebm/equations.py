@@ -51,7 +51,10 @@ def ebm_rhs(t, T_flat, drivers):
     E = E_flux(T_surf, Q1)
     G = G_flux(T_surf, Tsoil, nu)
 
+    # Convert from K/second to K/day (since solver uses t in days)
+    seconds_per_day = 86400.0
+
     # surface temperature tendency, Eq. 1
-    dTs_dt = (Rn - H - E - G) / C_surf
+    dTs_dt = (Rn - H - E - G) / C_surf * seconds_per_day
 
     return np.array([dTs_dt])
