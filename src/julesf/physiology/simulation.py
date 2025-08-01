@@ -10,8 +10,8 @@ def generate_forcings(settings):
     dt   = settings['dt_hours']
     t    = np.arange(0, days*24, dt)
 
-    T     = settings['T_mean'] + settings['T_amp'] * np.sin(2*np.pi*t/24)
-    I_par = np.maximum(0, settings['I_max'] * np.sin(np.pi*t/24)) * 1e-6
+    T     = settings['T_mean'] + settings['T_amp'] * np.sin(2 * np.pi*t/24)
+    I_par = np.maximum(0, settings['I_max'] * np.sin(2 * np.pi*t/24)) * 1e-6
 
     P     = settings['P']
     ca    = settings['ca_ppm'] * 1e-6 * P

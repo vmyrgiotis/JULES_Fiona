@@ -56,9 +56,11 @@ def diagnose_physiology_physics(pft_key='C3_grass', days=2):
     return results
 
 def plot_physiology_diagnostics(results):
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-    fig.suptitle('Physiology Physics Diagnostics', fontsize=14)
-    
+    plt.rcParams.update({"font.size": 8})
+
+    fig, axes = plt.subplots(2, 3, figsize=(12, 7))
+    fig.suptitle('Physiology Physics Diagnostics', fontsize=10)
+
     t = results['time']
     
     colors = {
@@ -84,16 +86,17 @@ def plot_physiology_diagnostics(results):
         'growth_resp': '#D35400',  # Dark orange
         'net_prod': '#2E86AB',     # Ocean blue
     }
-    
-    # 1. Rate Limiters Comparison (Wc, Wl, We vs W_gross)
+
+    # 1. Rate limiters Comparison (Wc, Wl, We vs W_gross)
     ax1 = axes[0, 0]
     ax1.plot(t, results['Wc'], color=colors['rubisco'], linewidth=2, label='Wc (Rubisco)', alpha=0.8)
     ax1.plot(t, results['Wl'], color=colors['light'], linewidth=2, label='Wl (Light)', alpha=0.8)
     ax1.plot(t, results['We'], color=colors['export'], linewidth=2, label='We (Export)', alpha=0.8)
     ax1.plot(t, results['Wg'], color=colors['gross'], linewidth=3, label='W_gross (min)', linestyle='--')
-    ax1.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=10)
-    ax1.set_title('Rate Limiters vs Gross Photosynthesis', fontsize=11)
-    ax1.legend(fontsize=9)
+    ax1.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=8)
+    ax1.set_title('Rate Limiters vs Gross Photosynthesis', fontsize=9)
+    ax1.tick_params(labelsize=7)
+    ax1.legend(fontsize=7)
     ax1.grid(True, alpha=0.2)
     
     # 2. Photosynthesis Balance Check (W_gross = Ap + Rd)
@@ -103,9 +106,10 @@ def plot_physiology_diagnostics(results):
     ax2.plot(t, results['Ap'], color=colors['net_potential'], linewidth=2, label='Ap (net potential)')
     ax2.plot(t, results['Rd'] + results['Ap'], color='black', linewidth=1.5, 
              linestyle=':', label='Rd + Ap (check)', alpha=0.7)
-    ax2.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=10)
-    ax2.set_title('Photosynthesis Balance: W = Ap + Rd', fontsize=11)
-    ax2.legend(fontsize=9)
+    ax2.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=8)
+    ax2.set_title('Photosynthesis Balance: W = Ap + Rd', fontsize=9)
+    ax2.tick_params(labelsize=7)
+    ax2.legend(fontsize=7)
     ax2.grid(True, alpha=0.2)
     
     # 3. Leaf-to-Canopy Scaling (Ap vs Ac)
@@ -121,9 +125,10 @@ def plot_physiology_diagnostics(results):
     ax3.plot(t, expected_Ac, color='black', linewidth=1.5, linestyle=':', 
              label=f'Ap × {scaling_factor:.2f} (expected)', alpha=0.7)
     
-    ax3.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=10)
-    ax3.set_title('Leaf-to-Canopy Scaling', fontsize=11)
-    ax3.legend(fontsize=9)
+    ax3.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=8)
+    ax3.set_title('Leaf-to-Canopy Scaling', fontsize=9)
+    ax3.tick_params(labelsize=7)
+    ax3.legend(fontsize=7)
     ax3.grid(True, alpha=0.2)
     
     # 4. Environmental Forcings
@@ -132,21 +137,22 @@ def plot_physiology_diagnostics(results):
     
     # Temperature on left axis
     line1 = ax4.plot(t, results['T'] - 273.15, color=colors['temperature'], linewidth=2, label='Temperature (°C)')
-    ax4.set_ylabel('Temperature (°C)', color=colors['temperature'], fontsize=10)
+    ax4.set_ylabel('Temperature (°C)', color=colors['temperature'], fontsize=8)
     ax4.tick_params(axis='y', labelcolor=colors['temperature'])
     
     # PAR on right axis
     line2 = ax4_twin.plot(t, results['I_par'], color=colors['par'], linewidth=2, label='PAR (μmol m⁻² s⁻¹)')
-    ax4_twin.set_ylabel('PAR (μmol m⁻² s⁻¹)', color=colors['par'], fontsize=10)
+    ax4_twin.set_ylabel('PAR (μmol m⁻² s⁻¹)', color=colors['par'], fontsize=8)
     ax4_twin.tick_params(axis='y', labelcolor=colors['par'])
     
-    ax4.set_title('Environmental Drivers', fontsize=11)
+    ax4.set_title('Environmental Drivers', fontsize=9)
+    ax4.tick_params(labelsize=7)
     ax4.grid(True, alpha=0.2)
     
     # Combined legend
     lines = line1 + line2
     labels = [l.get_label() for l in lines]
-    ax4.legend(lines, labels, loc='upper left', fontsize=9)
+    ax4.legend(lines, labels, loc='upper left', fontsize=7)
     
     # 5. NPP Components
     ax5 = axes[1, 1]
@@ -156,10 +162,11 @@ def plot_physiology_diagnostics(results):
     ax5.plot(t, results['Pi_net'], color=colors['net_prod'], linewidth=2.5, label='Pi_net (NPP)')
     ax5.plot(t, results['Pi_G'] - results['R_p'], color='black', linewidth=1.5, 
              linestyle=':', label='Pi_G - R_p (check)', alpha=0.7)
-    ax5.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=10)
-    ax5.set_xlabel('Time (hours)', fontsize=10)
-    ax5.set_title('NPP Balance: Pi_net = Pi_G - R_p', fontsize=11)
-    ax5.legend(fontsize=9)
+    ax5.set_ylabel('Rate (mol CO₂ m⁻² s⁻¹)', fontsize=8)
+    ax5.set_xlabel('Time (hours)', fontsize=8)
+    ax5.set_title('NPP Balance: Pi_net = Pi_G - R_p', fontsize=9)
+    ax5.tick_params(labelsize=7)
+    ax5.legend(fontsize=7)
     ax5.grid(True, alpha=0.2)
     
     # 6. Physics Sanity Checks
@@ -177,14 +184,15 @@ def plot_physiology_diagnostics(results):
     ax6.semilogy(t, balance_error, color=colors['net_potential'], linewidth=2, label='|W_gross - (Ap + Rd)|')
     ax6.semilogy(t, npp_error, color=colors['net_prod'], linewidth=2, label='|Pi_net - (Pi_G - R_p)|')
     
-    ax6.set_ylabel('Absolute Error', fontsize=10)
-    ax6.set_xlabel('Time (hours)', fontsize=10)
-    ax6.set_title('Physics Conservation Checks', fontsize=11)
-    ax6.legend(fontsize=9)
+    ax6.set_ylabel('Absolute Error', fontsize=8)
+    ax6.set_xlabel('Time (hours)', fontsize=8)
+    ax6.set_title('Physics Conservation Checks', fontsize=9)
+    ax6.tick_params(labelsize=7)
+    ax6.legend(fontsize=7)
     ax6.grid(True, alpha=0.2)
     
-    plt.tight_layout(pad=2.0)
-    plt.subplots_adjust(top=0.93)
+    plt.tight_layout(pad=1.5)
+    plt.subplots_adjust(top=0.90)
     plt.show()
     
     return fig
