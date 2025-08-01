@@ -72,83 +72,96 @@ def diagnose_ebm_physics(days=2, dt_out=0.5/24):
     return results
 
 def plot_ebm_diagnostics(results):
-    """
-    Create comprehensive diagnostic plots
-    """
-    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
-    fig.suptitle('EBM Physics Diagnostics', fontsize=16)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+    fig.suptitle('EBM Physics Diagnostics', fontsize=14)
     
     t = results['time']
     
+    colors = {
+        'surf': '#E74C3C',      
+        'air': '#3498DB',       
+        'soil': '#27AE60',      
+        'solar': '#F39C12',     
+        'absorbed': '#E67E22',  
+        'incoming_lw': '#9B59B6', 
+        'absorbed_lw': '#2980B9', 
+        'emitted': '#34495E',   
+        'sensible': '#C0392B',  
+        'latent': '#2E86AB',    
+        'ground': '#16A085',    
+        'net_rad': '#2C3E50',   
+        'balance': '#E74C3C'    
+    }
+    
     # 1. Temperature evolution
     ax1 = axes[0, 0]
-    ax1.plot(t, results['T_surf'], 'r-', label='T_surf', linewidth=2)
-    ax1.plot(t, results['T_air'], 'b--', label='T_air')
-    ax1.plot(t, results['T_soil'], 'g:', label='T_soil')
-    ax1.set_ylabel('Temperature (K)')
-    ax1.set_title('Temperature Components')
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
+    ax1.plot(t, results['T_surf'], color=colors['surf'], linewidth=2.5, label='T_surf')
+    ax1.plot(t, results['T_air'], color=colors['air'], linestyle='--', linewidth=2, label='T_air')
+    ax1.plot(t, results['T_soil'], color=colors['soil'], linestyle=':', linewidth=2, label='T_soil')
+    ax1.set_ylabel('Temperature (K)', fontsize=10)
+    ax1.set_title('Temperature Components', fontsize=11)
+    ax1.legend(fontsize=9)
+    ax1.grid(True, alpha=0.2)
     
     # 2. Radiation balance
     ax2 = axes[0, 1]
-    ax2.plot(t, results['Sdn'], 'orange', label='Sdn (incoming SW)')
-    ax2.plot(t, results['Sw_absorbed'], 'red', label='SW absorbed')
-    ax2.plot(t, results['Ldn'], 'purple', label='Ldn (incoming LW)')
-    ax2.plot(t, results['Lw_absorbed'], 'blue', label='LW absorbed')
-    ax2.plot(t, -results['Lw_emitted'], 'black', label='-LW emitted')
-    ax2.set_ylabel('Radiation (W/m²)')
-    ax2.set_title('Radiation Components')
-    ax2.legend()
-    ax2.grid(True, alpha=0.3)
+    ax2.plot(t, results['Sdn'], color=colors['solar'], linewidth=2, label='Sdn (incoming)')
+    ax2.plot(t, results['Sw_absorbed'], color=colors['absorbed'], linewidth=2, label='SW absorbed')
+    ax2.plot(t, results['Ldn'], color=colors['incoming_lw'], linewidth=1.5, label='Ldn (incoming LW)')
+    ax2.plot(t, results['Lw_absorbed'], color=colors['absorbed_lw'], linewidth=1.5, label='LW absorbed')
+    ax2.plot(t, -results['Lw_emitted'], color=colors['emitted'], linewidth=2, label='-LW emitted')
+    ax2.set_ylabel('Radiation (W/m²)', fontsize=10)
+    ax2.set_title('Radiation Components', fontsize=11)
+    ax2.legend(fontsize=8)
+    ax2.grid(True, alpha=0.2)
     
     # 3. Turbulent fluxes
-    ax3 = axes[0, 2]
-    ax3.plot(t, results['H'], 'red', label='H (sensible)')
-    ax3.plot(t, results['E'], 'blue', label='E (latent)')
-    ax3.plot(t, results['G'], 'green', label='G (ground)')
-    ax3.set_ylabel('Heat Flux (W/m²)')
-    ax3.set_title('Turbulent Fluxes')
-    ax3.legend()
-    ax3.grid(True, alpha=0.3)
+    ax3 = axes[1, 0]
+    ax3.plot(t, results['H'], color=colors['sensible'], linewidth=2.5, label='H (sensible)')
+    ax3.plot(t, results['E'], color=colors['latent'], linewidth=2.5, label='E (latent)')
+    ax3.plot(t, results['G'], color=colors['ground'], linewidth=2, label='G (ground)')
+    ax3.set_ylabel('Heat Flux (W/m²)', fontsize=10)
+    ax3.set_title('Turbulent Fluxes', fontsize=11)
+    ax3.legend(fontsize=9)
+    ax3.grid(True, alpha=0.2)
     
     # 4. Net energy balance
-    ax4 = axes[1, 0]
-    ax4.plot(t, results['Rn'], 'black', label='Rn (net radiation)', linewidth=2)
-    ax4.plot(t, results['Net_energy'], 'red', label='Net energy balance')
-    ax4.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
-    ax4.set_ylabel('Energy (W/m²)')
-    ax4.set_title('Energy Balance')
-    ax4.legend()
-    ax4.grid(True, alpha=0.3)
+    ax4 = axes[1, 1]
+    ax4.plot(t, results['Rn'], color=colors['net_rad'], linewidth=3, label='Rn (net radiation)')
+    ax4.plot(t, results['Net_energy'], color=colors['balance'], linewidth=2, label='Net energy balance')
+    ax4.axhline(y=0, color='gray', linestyle='--', alpha=0.4)
+    ax4.set_ylabel('Energy (W/m²)', fontsize=10)
+    ax4.set_title('Energy Balance', fontsize=11)
+    ax4.legend(fontsize=9)
+    ax4.grid(True, alpha=0.2)
     
-    # 5. Diurnal patterns
-    ax5 = axes[1, 1]
-    # Focus on first day for diurnal pattern
-    day1_mask = t <= 1.0
-    t_day1 = t[day1_mask]
-    ax5.plot(t_day1*24, results['Sdn'][day1_mask], 'orange', label='Solar')
-    ax5.plot(t_day1*24, results['H'][day1_mask], 'red', label='Sensible')
-    ax5.plot(t_day1*24, results['E'][day1_mask], 'blue', label='Latent')
-    ax5.set_xlabel('Hour of day')
-    ax5.set_ylabel('Flux (W/m²)')
-    ax5.set_title('Diurnal Cycle (Day 1)')
-    ax5.legend()
-    ax5.grid(True, alpha=0.3)
+    # # 5. Diurnal patterns
+    # ax5 = axes[1, 1]
+    # day1_mask = t <= 1.0
+    # t_day1 = t[day1_mask]
+    # ax5.plot(t_day1*24, results['Sdn'][day1_mask], color=colors['solar'], linewidth=2.5, label='Solar')
+    # ax5.plot(t_day1*24, results['H'][day1_mask], color=colors['sensible'], linewidth=2, label='Sensible')
+    # ax5.plot(t_day1*24, results['E'][day1_mask], color=colors['latent'], linewidth=2, label='Latent')
+    # ax5.set_xlabel('Hour of day', fontsize=10)
+    # ax5.set_ylabel('Flux (W/m²)', fontsize=10)
+    # ax5.set_title('Diurnal Cycle (Day 1)', fontsize=11)
+    # ax5.legend(fontsize=9)
+    # ax5.grid(True, alpha=0.2)
     
-    # 6. Physics checks
-    ax6 = axes[1, 2]
-    # Check energy conservation
-    energy_imbalance = np.abs(results['Net_energy'])
-    ax6.plot(t, energy_imbalance, 'red', label='|Energy imbalance|')
-    ax6.set_ylabel('|Energy imbalance| (W/m²)')
-    ax6.set_xlabel('Time (days)')
-    ax6.set_title('Energy Conservation Check')
-    ax6.legend()
-    ax6.grid(True, alpha=0.3)
-    ax6.set_yscale('log')
+    # # 6. Physics checks
+    # ax6 = axes[1, 2]
+    # energy_imbalance = np.abs(results['Net_energy'])
+    # ax6.plot(t, energy_imbalance, color='#8E44AD', linewidth=2.5, label='|Energy imbalance|')
+    # ax6.set_ylabel('|Energy imbalance| (W/m²)', fontsize=10)
+    # ax6.set_xlabel('Time (days)', fontsize=10)
+    # ax6.set_title('Energy Conservation Check', fontsize=11)
+    # ax6.legend(fontsize=9)
+    # ax6.grid(True, alpha=0.2)
+    # ax6.set_yscale('log')
     
-    plt.tight_layout()
+    # Make plots more compact
+    plt.tight_layout(pad=2.0)
+    plt.subplots_adjust(top=0.93)
     plt.show()
     
     return fig
