@@ -25,10 +25,10 @@ PFT_PARAMS = {
 }
 
 COMPETITION_MATRIX = {
-    'c': np.array([[1.0, 1.0], [0.0, 1.0]]),  # Competition coefficients
+    'c': np.array([[1.0, 0.7], [1.2, 1.0]]),  # Competition coefficients
 }
 
 INITIAL_CONDITIONS = {
     'Lb_init': np.array([6.0, 3.0]),    # m² m⁻², initial balanced LAI
-    'nu_init': np.array([0.8, 0.2]),    # dimensionless, initial fractional cover
+    'nu_init': np.array([0.6, 0.4]),    # dimensionless, initial fractional cover
 }
