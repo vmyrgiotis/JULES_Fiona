@@ -174,3 +174,5 @@ if __name__ == "__main__":
     res = diagnose_soil_physics()
     plot_soil_diagnostics(res)
     plot_layer_fluxes(res)
+
+    
