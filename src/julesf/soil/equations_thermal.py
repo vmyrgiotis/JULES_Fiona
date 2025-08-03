@@ -1,4 +1,4 @@
-# src/soil/equations_thermal.py
+# equations_thermal.py
 """
 JULES Soil Thermal Equations
 Main equation: Eq. (53) - Heat conduction with advection
@@ -59,7 +59,7 @@ def diffusive_heat_flux(T_soil, layer_thickness, params, theta):
         dT_dz = (T_soil[k] - T_soil[k-1]) / dz
         
         # Fourier's law: G = -λ ∂T/∂z (negative sign for downward positive)
-        G[k] = lambda_avg * dT_dz
+        G[k] = - lambda_avg * dT_dz
     
     # Bottom boundary - free heat conduction
     lambda_bottom = lambda_soil[-1]

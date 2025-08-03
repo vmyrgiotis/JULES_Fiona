@@ -86,7 +86,7 @@ def soil_rhs(t, y, params, drivers):
     
     return dydt
 
-def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="RK45", dt_out=0.5):
+def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="BDF", dt_out=0.5):
     """
     IVP solver for coupled soil moisture-thermal system
     
