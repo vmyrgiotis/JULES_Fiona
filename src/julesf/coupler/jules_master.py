@@ -7,7 +7,7 @@ from julesf.coupler.coupling_utils import extract_vegetation_vars
 from julesf.rothc.parameters import POOLS, C0_default
 from julesf.soil.parameters import SOIL_LAYERS, INITIAL_CONDITIONS
 
-def jules_master_coupler(weeks=1400, triffid_init=None, rothc_init=None, soil_init=None):
+def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None):
     start_time = time.time()
     
     # Initialize model states
@@ -135,10 +135,10 @@ def jules_master_coupler(weeks=1400, triffid_init=None, rothc_init=None, soil_in
 
 def run_jules_simulation(config=None):
     if config is None:
-        config = {'weeks': 1400}
+        config = {'weeks': 52}
         
     results = jules_master_coupler(
-        weeks=config.get('weeks', 1400),
+        weeks=config.get('weeks', 52),
         triffid_init=config.get('triffid_init'),
         rothc_init=config.get('rothc_init'),
         soil_init=config.get('soil_init')
