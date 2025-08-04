@@ -7,8 +7,40 @@ from julesf.coupler.coupling_utils import extract_vegetation_vars
 from julesf.rothc.parameters import POOLS, C0_default
 from julesf.soil.parameters import SOIL_LAYERS, INITIAL_CONDITIONS
 
-def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None):
+def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init=None, 
+                        external_drivers=None):
+    """
+    JULES master coupler with optional external meteorological drivers
+    
+    Args:
+        weeks: Number of weeks to simulate
+        triffid_init: Initial TRIFFID state [Lb_tree, Lb_grass, nu_tree, nu_grass]
+        rothc_init: Initial RothC state [C_dpm, C_rpm, C_bio, C_hum]
+        soil_init: Initial soil state {'theta': array, 'T_soil': array}
+        external_drivers: Optional external forcing in format:
+                         {
+                             'era5_forcing': {
+                                 'Tair': lambda t: temp_at_time_t,
+                                 'Sdn': lambda t: solar_at_time_t,
+                                 'precip': lambda t: precip_at_time_t,
+                                 ...
+                             }
+                         }
+                         If None, uses internal synthetic drivers.
+    """
     start_time = time.time()
+    
+    print(f"=== Starting JULES Master Coupling: {weeks} weeks ===")
+    
+    # Debug: Check external drivers
+    if external_drivers:
+        print(f"External drivers provided: {list(external_drivers.keys())}")
+        if 'era5_forcing' in external_drivers:
+            print(f"ERA5 forcing variables: {list(external_drivers['era5_forcing'].keys())}")
+        else:
+            print("⚠️  WARNING: external_drivers provided but no 'era5_forcing' found!")
+    else:
+        print("Using internal synthetic forcing")
     
     # Initialize model states
     triffid_state = triffid_init if triffid_init is not None else [6.0, 3.0, 0.8, 0.2]
@@ -70,21 +102,21 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
     results['weekly']['C_bio'][0] = rothc_state[2]
     results['weekly']['C_hum'][0] = rothc_state[3]
     
-    print(f"=== Starting JULES Master Coupling: {weeks} weeks ===")
-    
+    # Main simulation loop
     for week in range(weeks):
-        # 1. Extract vegetation coupling variables
+        # 1. Extract vegetation coupling variables from TRIFFID
         veg_vars = extract_vegetation_vars(triffid_state)
         
-        # 2. Run fast models (0.5h) for 1 week
+        # 2. Run fast models (EBM + Soil + Physiology)
         fast_results = run_fast_models_week(
             nu_cover=veg_vars['nu_total'],
             LAI_total=veg_vars['LAI_total'],
             soil_initial=soil_state,
-            week_num=week
+            week_num=week,
+            external_drivers=external_drivers  # Pass external drivers (or None)
         )
         
-        # 3. Run slow models (weekly)
+        # 3. Run slow models (TRIFFID + RothC)
         slow_results = run_slow_models_week(
             fast_results=fast_results,
             triffid_state=triffid_state,
@@ -122,8 +154,7 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
         results['weekly']['soil_moisture_mean'][week] = np.mean(fast_results['soil_theta'][0, :])
         results['weekly']['soil_temp_mean'][week] = np.mean(fast_results['soil_T'][0, :])
         
-        print(f"Week {week+1:2d}: Running slow models (TRIFFID + RothC)... ")
-        print(f"NPP={fast_results['NPP_total']:.4f} kg C/m²/wk, "
+        print(f"Week {week+1:2d}: NPP={fast_results['NPP_total']:.4f} kg C/m²/wk, "
               f"θ={results['weekly']['soil_moisture_mean'][week]:.3f} m³/m³, "
               f"T={results['weekly']['soil_temp_mean'][week]-273.15:.1f}°C, "
               f"LAI={veg_vars['LAI_total']:.2f}")
@@ -131,9 +162,18 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
     elapsed = time.time() - start_time
     print(f"\nSimulation completed in {elapsed:.1f} seconds")
     
+    # Store metadata
+    results['metadata'] = {
+        'external_forcing': 'ERA5' if external_drivers else 'Synthetic',
+        'weeks': weeks,
+        'elapsed_time': elapsed
+    }
+    
     return results
 
+# Legacy function for backward compatibility
 def run_jules_simulation(config=None):
+    """Legacy function - use jules_master_coupler directly"""
     if config is None:
         config = {'weeks': 52}
         
@@ -147,4 +187,6 @@ def run_jules_simulation(config=None):
     return results
 
 if __name__ == '__main__':
-    results = run_jules_simulation()
+    # Test with synthetic drivers
+    results = jules_master_coupler(weeks=4)
+    print(f"Test simulation complete. Used {results['metadata']['external_forcing']} forcing.")
