@@ -134,23 +134,31 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     
     if external_drivers and 'era5_forcing' in external_drivers:
         era5 = external_drivers['era5_forcing']
-        soil_drivers_complete['precip'] = lambda t: max(0, era5['precip'](t))  # kg/m²/s
+        soil_drivers_complete['precipitation'] = lambda t: max(0, era5['precip'](t))  # FIXED KEY
         
+        # temperature-based ET
+        # TODO: add ET data
+        soil_drivers_complete['evapotranspiration'] = lambda t: (
+            5e-5 * max(0, (era5['Tair'](t) - 273.15) / 25) 
+        )
+
         # Test precipitation
         try:
-            test_precip = soil_drivers_complete['precip'](24.0)  # 1 day in
+            test_precip = soil_drivers_complete['precipitation'](24.0)  # 1 day in
             print(f"  ✓ Soil: Using ERA5 precipitation (test: {test_precip:.6f} kg/m²/s)")
         except Exception as e:
             print(f"  ❌ ERA5 precipitation test failed: {e}")
     else:
-        soil_drivers_complete['precip'] = lambda t: 1e-5  # Default precipitation
-        print(f"  ✓ Soil: Using default precipitation")
+        soil_drivers_complete['precipitation'] = lambda t: 1e-5  # Default precipitation
+        soil_drivers_complete['evapotranspiration'] = lambda t: 2e-5  # Default ET rate
+        print(f"  ✓ Soil: Using default precipitation and evaporatranspiration")
     
     # Add EBM surface temperature coupling
     soil_drivers_complete['T_surface'] = lambda t: np.interp(t, t_ebm, Ts_ebm)
     
     # Add vegetation coupling
     soil_drivers_complete['nu'] = lambda t: nu_cover  # For evapotranspiration
+    
     
     # ========== 6. RUN SOIL MODEL ==========
     t_soil, theta_ts, T_ts = solve_soil_rhs(

@@ -23,13 +23,17 @@ def generate_soil_forcings(days=7, dt_hours=0.5):
     # Diurnal air temperature (K) - 10°C ± 5°C with random noise
     T_air = 283.15 + 5 * np.sin(2*np.pi*t/24) + np.random.normal(0, 1, len(t))
     
-    # Precipitation (kg/m²/s) - random bursts, positive half-normal
-    precip_base = np.maximum(0, np.random.normal(0, 1e-5, len(t)))
-    precip_events = (np.random.random(len(t)) < 0.02)  # 2% chance of rain each timestep
-    precip = precip_base + precip_events * np.random.exponential(5e-5, len(t))
+    # Base precipitation: very light continuous
+    precip_base = np.maximum(0, np.random.normal(0, 1e-4, len(t)))  
     
-    # Evapotranspiration (kg/m²/s) - daytime peak, temperature dependent
-    ET_potential = np.maximum(0, 2e-5 * np.sin(np.pi * (t % 24) / 24))
+    # Rain events: 2% chance per timestep, with realistic intensity
+    precip_events = (np.random.random(len(t)) < 0.02)  # 2% chance of rain
+    rain_intensity = np.random.exponential(1e-3, len(t)) 
+    precip = precip_base + precip_events * rain_intensity
+    
+    # Evapotranspiration (kg/m²/s) 
+    # Typical ET: 2-6 mm/day = 2.3e-5 to 6.9e-5 kg/m²/s average
+    ET_potential = np.maximum(0, 1e-4 * np.sin(np.pi * (t % 24) / 24))  
     ET = ET_potential * np.maximum(0, (T_air - 273.15) / 20)  # Temperature scaling
     
     # Surface heat flux (W/m²) - diurnal solar cycle

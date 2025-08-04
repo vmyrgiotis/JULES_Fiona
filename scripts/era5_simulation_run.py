@@ -44,7 +44,7 @@ def create_era5_config(era5_drivers, simulation_weeks=52):
         'time_bounds': era5_drivers.get('time_bounds', (0, simulation_weeks * 7 * 24))
     }
 
-def run_jules_era5_simulation(data_file, metadata_file, weeks=52, output_dir='results'):
+def run_jules_era5_simulation(data_file, metadata_file, weeks=52, output_dir='results', days_to_plot=30):
     """
     Run JULES simulation with ERA5 meteorological forcing
     """
@@ -103,22 +103,27 @@ def run_jules_era5_simulation(data_file, metadata_file, weeks=52, output_dir='re
         print(f"✓ Simulation completed successfully!")
         print(f"✓ Forcing used: {results['metadata']['external_forcing']}")
         
-        # 6. Create output directory and save results
-        os.makedirs(output_dir, exist_ok=True)
-        
-        print("Generating coupling analysis plots...")
-        summary = visualize_jules_coupling(results, save_path=os.path.join(output_dir, 'coupling_plots'))
-        
-        print("Saving ERA5 data summary...")
+        # 6. Generate coupling analysis plots and capture summary
+        print("Generating coupling analysis plots…")
+        summary = visualize_jules_coupling(
+            results,
+            save_path=os.path.join(output_dir, 'coupling_plots')
+        )
+
+        # 7. Save ERA5 data summary
         save_era5_summary(era5_data['summary'], output_dir)
-        
+
+        # 8. Plot forcing for first N days
+        print(f"Plotting first {days_to_plot} days of forcing…")
+        plot_era5_forcing(era5_data, output_dir, days_to_plot)
+
         return {
             'results': results,
             'era5_data': era5_data,
             'config': config,
-            'summary': summary
+            'summary': summary   # now defined
         }
-        
+
     except Exception as e:
         print(f"❌ Simulation failed: {e}")
         raise
@@ -145,8 +150,12 @@ def plot_era5_forcing(era5_data, output_dir, days_to_plot=30):
     data = era5_data['data']
     time_hours = data['time_hours']
     
-    # Limit to first N days for clarity
-    end_idx = min(len(time_hours), days_to_plot * 24)
+    # actual timestep in hours
+    dt_h = time_hours[1] - time_hours[0]
+    # number of steps for days_to_plot days
+    steps = int(days_to_plot * 24 / dt_h)
+    end_idx = min(len(time_hours), steps)
+    
     time_days = time_hours[:end_idx] / 24
     
     fig, axes = plt.subplots(3, 2, figsize=(14, 12))
@@ -233,7 +242,7 @@ if __name__ == "__main__":
         simulation_results = run_jules_era5_simulation(
             data_file=data_file,
             metadata_file=metadata_file,
-            weeks=4,  # Short test
+            weeks=8,  
             output_dir="results/era5_simulation"
         )
         

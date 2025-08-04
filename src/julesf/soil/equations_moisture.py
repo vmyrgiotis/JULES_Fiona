@@ -116,15 +116,11 @@ def infiltration_rate(params, drivers, t):
     if 'precipitation' in drivers:
         precip = drivers['precipitation'](t)  # kg/m²/s
         
-        # Simple infiltration capacity check
-        K_sat = params['K_sat'] * 1000  # Convert m/s to kg/m²/s (ρ_water = 1000)
+        # Convert K_sat from m/s to kg/m²/s properly
+        rho_water = params.get('rho_water', 1000.0)  # kg/m³
+        K_sat_kg = params['K_sat'] * rho_water  # m/s × kg/m³ = kg/m²/s
         
-        # Infiltration limited by saturated conductivity
-        W0 = min(precip, K_sat)
-        
-        # Surface runoff is excess precipitation
-        # TODO: Add proper surface storage and runoff routing
-        
+        W0 = min(precip, K_sat_kg)
         return max(0, W0)
     else:
         return 0.0
