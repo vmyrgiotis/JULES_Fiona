@@ -93,23 +93,32 @@ def soil_rhs(t, y, params, drivers):
 def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="BDF", dt_out=0.5):
     """
     IVP solver for coupled soil moisture-thermal system
-    
-    Parameters:
-    - t_span:     time span (start, end) in hours
-    - theta_init: initial moisture content array (m³/m³)
-    - T_init:     initial temperature array (K)  
-    - drivers:    forcing functions dictionary
-    - method:     ODE solver method
-    - dt_out:     output timestep (hours)
-    
-    Returns:
-    - t:       time array (hours)
-    - theta:   moisture content array (n_layers × n_times)
-    - T_soil:  soil temperature array (n_layers × n_times)
     """
     
     # Combine soil parameters
     params = {**SOIL_LAYERS, **SOIL_PROPERTIES, **VAN_GENUCHTEN, **THERMAL_PROPERTIES}
+    
+    # FIXED: Ensure both theta_init and T_init are arrays with same length
+    if theta_init is None:
+        n_layers = params['n_layers']
+        theta_init = np.full(n_layers, INITIAL_CONDITIONS.get('theta_init', 0.3))
+    
+    if T_init is None:
+        n_layers = len(theta_init)  # Use theta_init length
+        T_init = np.full(n_layers, INITIAL_CONDITIONS.get('T_init', 283.15))
+    
+    # Ensure T_init is an array, not a scalar
+    if np.isscalar(T_init):
+        n_layers = len(theta_init)
+        T_init = np.full(n_layers, T_init)
+    
+    # Ensure both arrays have the same length
+    if len(theta_init) != len(T_init):
+        n_layers = params['n_layers']
+        print(f"⚠️  Warning: theta_init ({len(theta_init)}) and T_init ({len(T_init)}) have different lengths")
+        print(f"   Resizing both to {n_layers} layers")
+        theta_init = np.full(n_layers, np.mean(theta_init) if len(theta_init) > 0 else 0.3)
+        T_init = np.full(n_layers, np.mean(T_init) if len(T_init) > 0 else 283.15)
     
     # Set up initial state vector
     y0 = np.concatenate([theta_init, T_init])
@@ -119,7 +128,7 @@ def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="BDF", dt_out=0.5
     
     # Solve ODE system 
     print(f"Solving coupled soil system from t={t_span[0]} to t={t_span[1]} hours...")
-    print(f"State variables: {len(y0)} ({params['n_layers']} moisture + {params['n_layers']} temperature)")
+    print(f"State variables: {len(y0)} ({len(theta_init)} moisture + {len(T_init)} temperature)")
     
     sol = solve_ivp(
         fun=lambda t, y: soil_rhs(t, y, params, drivers),
@@ -135,12 +144,17 @@ def solve_soil_rhs(t_span, theta_init, T_init, drivers, method="BDF", dt_out=0.5
         raise RuntimeError(f"ODE solver failed: {sol.message}")
     
     # Split solution
-    n_layers = params['n_layers']
-    theta = sol.y[:n_layers, :]      # moisture (n_layers × n_times)
-    T_soil = sol.y[n_layers:, :]     # temperature (n_layers × n_times)
-    
+    n_layers = len(theta_init)
+    theta    = sol.y[:n_layers, :]      # moisture (n_layers × n_times)
+    T_soil   = sol.y[n_layers:, :]      # temperature (n_layers × n_times)
+ 
+    # ENFORCE physical bounds on θ
+    θ_res = params.get('theta_res', 0.0)
+    θ_sat = params.get('theta_sat', 1.0)
+    theta = np.clip(theta, θ_res, θ_sat)
+ 
     print(f"Simulation completed successfully!")
-    print(f"Final moisture range: {theta.min():.3f} - {theta.max():.3f} m³/m³")
+    print(f"Final moisture range (clamped): {theta.min():.3f} - {theta.max():.3f} m³/m³")
     print(f"Final temperature range: {T_soil.min():.1f} - {T_soil.max():.1f} K")
-    
+ 
     return sol.t, theta, T_soil

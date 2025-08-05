@@ -2,8 +2,8 @@ import os
 
 # Data file paths
 DATA_DIR = "../data"
-ERA5_DATA_FILE = os.path.join(DATA_DIR, "era5_jules_met_ins_2002-2004.csv")
-ERA5_METADATA_FILE = os.path.join(DATA_DIR, "era5_jules_met_ins_metadata_2002-2004.csv")
+ERA5_DATA_FILE = os.path.join(DATA_DIR, "era5_jules_met_ins_2002-2016.csv")
+ERA5_METADATA_FILE = os.path.join(DATA_DIR, "era5_jules_met_ins_metadata.csv")
 
 # Simulation configurations
 SIMULATION_CONFIGS = {
@@ -26,8 +26,8 @@ SIMULATION_CONFIGS = {
     },
     
     'multi_year': {
-        'weeks': 104,
-        'description': 'Two-year simulation',
+        'weeks': 15 * 52,      # ~15 years (2002–2016)
+        'description': '15-year simulation (2002–2016)',
         'output_dir': 'results/era5_multi_year'
     }
 }

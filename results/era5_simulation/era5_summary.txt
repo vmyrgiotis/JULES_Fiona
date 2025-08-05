@@ -2,34 +2,34 @@ ERA5 Meteorological Data Summary
 ========================================
 
 air_temperature:
-  Mean: 276.988 K
-  Std:  10.388 K
-  Min:  240.098 K
-  Max:  303.010 K
+  Mean: 277.238 K
+  Std:  10.379 K
+  Min:  238.367 K
+  Max:  303.902 K
 
 net_shortwave:
-  Mean: 164.131 J m**-2
-  Std:  235.143 J m**-2
+  Mean: 163.055 J m**-2
+  Std:  233.709 J m**-2
   Min:  0.000 J m**-2
-  Max:  929.118 J m**-2
+  Max:  931.691 J m**-2
 
 net_longwave:
-  Mean: -81.691 J m**-2
-  Std:  32.837 J m**-2
+  Mean: -81.367 J m**-2
+  Std:  32.775 J m**-2
   Min:  -197.115 J m**-2
   Max:  2.323 J m**-2
 
 shortwave_down:
-  Mean: 220.953 J m**-2
-  Std:  294.833 J m**-2
+  Mean: 220.378 J m**-2
+  Std:  293.987 J m**-2
   Min:  -0.000 J m**-2
-  Max:  1057.408 J m**-2
+  Max:  1058.875 J m**-2
 
 longwave_down:
-  Mean: 248.808 J m**-2
-  Std:  46.066 J m**-2
-  Min:  126.618 J m**-2
-  Max:  384.390 J m**-2
+  Mean: 249.633 J m**-2
+  Std:  46.619 J m**-2
+  Min:  121.189 J m**-2
+  Max:  387.973 J m**-2
 
 precipitation:
   Mean: 0.000 m
@@ -37,15 +37,27 @@ precipitation:
   Min:  0.000 m
   Max:  0.002 m
 
+evapotranspiration:
+  Mean: 455.551 mm hr-1
+  Std:  406.588 mm hr-1
+  Min:  11.384 mm hr-1
+  Max:  1905.730 mm hr-1
+
+PAR:
+  Mean: 99.170 W m-2
+  Std:  132.294 W m-2
+  Min:  -0.000 W m-2
+  Max:  476.494 W m-2
+
 surface_pressure:
-  Mean: 75046.895 Pa
-  Std:  600.826 Pa
-  Min:  72772.440 Pa
-  Max:  76449.500 Pa
+  Mean: 75042.471 Pa
+  Std:  604.292 Pa
+  Min:  72567.810 Pa
+  Max:  76467.440 Pa
 
 co2_concentration:
-  Mean: 379.872 ppm
-  Std:  4.561 ppm
+  Mean: 388.248 ppm
+  Std:  9.411 ppm
   Min:  369.550 ppm
-  Max:  390.730 ppm
+  Max:  409.550 ppm
 

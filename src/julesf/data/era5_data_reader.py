@@ -38,7 +38,7 @@ class ERA5DataReader:
         
         # Convert time column to datetime
         self.data['datetime'] = pd.to_datetime(self.data['valid_time'], 
-                                               format='%d/%m/%Y %H:%M')
+                                               format='%m/%d/%Y %H:%M')
         
         # Set datetime as index
         self.data.set_index('datetime', inplace=True)
@@ -203,8 +203,8 @@ if __name__ == "__main__":
     project_root = os.path.join(script_dir, "..", "..", "..")
     data_dir = os.path.join(project_root, "data")
     
-    data_file = os.path.join(data_dir, "era5_jules_met_ins_2002-2004.csv")
-    metadata_file = os.path.join(data_dir, "era5_jules_met_ins_metadata_2002-2004.csv")
+    data_file = os.path.join(data_dir, "era5_jules_met_ins_2002-2016.csv")
+    metadata_file = os.path.join(data_dir, "era5_jules_met_ins_metadata.csv")
     
     # Check if files exist
     if not os.path.exists(data_file):

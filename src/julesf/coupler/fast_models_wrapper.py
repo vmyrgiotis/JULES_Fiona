@@ -92,16 +92,20 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     ebm_drivers_complete['nu'] = lambda t: nu_cover  # From TRIFFID
     
     # Initial Tsoil estimate (will be updated by soil coupling in subsequent weeks)
-    if soil_initial and 'T_soil' in soil_initial:
+    if soil_initial is not None and isinstance(soil_initial, dict) and 'T_soil' in soil_initial:
         mean_tsoil = np.mean(soil_initial['T_soil'])
         ebm_drivers_complete['Tsoil'] = lambda t: mean_tsoil
     else:
         ebm_drivers_complete['Tsoil'] = lambda t: ebm_drivers_complete['Tair'](t) - 2.0
-    
+
     print(f"  ✓ EBM coupling: nu={nu_cover:.3f}")
+
+    # Initial temperature for EBM
+    if soil_initial is not None and isinstance(soil_initial, dict) and 'T_soil' in soil_initial:
+        T0 = soil_initial['T_soil'][0]
+    else:
+        T0 = ebm_drivers_complete['Tair'](0)
     
-    # ========== 2. RUN EBM ==========
-    T0 = soil_initial['T_soil'][0] if (soil_initial and 'T_soil' in soil_initial) else ebm_drivers_complete['Tair'](0)
     print(f"  ✓ EBM initial temperature: {T0:.1f}K")
     
     t_ebm, Ts_ebm = run_ebm(t_span, T0, ebm_drivers_complete, dt_out=dt_hours/24)
@@ -153,11 +157,26 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     
     
     # ========== 6. RUN SOIL MODEL ==========
+    # FIXED: Handle soil_initial properly - can be None, array, or dict
+    theta_arg = None
+    T_arg = None
+    
+    if soil_initial is not None:
+        if isinstance(soil_initial, dict):
+            # Dictionary format: {'theta': array, 'T_soil': array}
+            theta_arg = soil_initial.get('theta')
+            T_arg = soil_initial.get('T_soil')
+        else:
+            # Assume it's just a theta array
+            theta_arg = soil_initial
+            T_arg = None  # Will use default in solve_soil_rhs
+    
     t_soil, theta_ts, T_ts = solve_soil_rhs(
         t_span=(0, days*24),
-        theta_init=soil_initial['theta'] if soil_initial else None,
-        T_init=soil_initial['T_soil'] if soil_initial else None,
+        theta_init=theta_arg,
+        T_init=T_arg,
         drivers=soil_drivers_complete,
+        method="BDF",
         dt_out=dt_hours
     )
     print(f"  ✓ Soil complete: θ={np.mean(theta_ts[0,:]):.3f} m³/m³, T={np.mean(T_ts[0,:])-273.15:.1f}°C")

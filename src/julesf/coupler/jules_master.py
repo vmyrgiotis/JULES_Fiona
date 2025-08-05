@@ -48,13 +48,12 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
     
     # Build default soil state if none provided
     if soil_init is None:
-        n = SOIL_LAYERS['n_layers']
-        soil_state = {
-            'theta': np.full(n, INITIAL_CONDITIONS['theta_init']),
-            'T_soil': np.full(n, INITIAL_CONDITIONS['T_init'])
+        nlay = SOIL_LAYERS['n_layers']
+        # Create proper dict with both theta and T_soil as arrays
+        soil_init = {
+            'theta': np.full(nlay, INITIAL_CONDITIONS.get('theta_init', 0.3)),
+            'T_soil': np.full(nlay, INITIAL_CONDITIONS.get('T_init', 283.15))
         }
-    else:
-        soil_state = soil_init
     
     # Pre-allocate storage arrays for results
     results = {
@@ -102,6 +101,12 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
     results['weekly']['C_bio'][0] = rothc_state[2]
     results['weekly']['C_hum'][0] = rothc_state[3]
     
+    # Add archive for fast model results
+    results['fast_results_archive'] = []
+    
+    # Store detailed weekly results
+    results['weekly_results'] = []
+    
     # Main simulation loop
     for week in range(weeks):
         # 1. Extract vegetation coupling variables from TRIFFID
@@ -111,10 +116,17 @@ def jules_master_coupler(weeks=52, triffid_init=None, rothc_init=None, soil_init
         fast_results = run_fast_models_week(
             nu_cover=veg_vars['nu_total'],
             LAI_total=veg_vars['LAI_total'],
-            soil_initial=soil_state,
+            soil_initial=soil_init,
             week_num=week,
-            external_drivers=external_drivers  # Pass external drivers (or None)
+            external_drivers=external_drivers
         )
+        
+        # Store the full fast_results (contains time series)
+        results['weekly_results'].append(fast_results)
+        
+        # Archive first few weeks of detailed results for plotting
+        if week < 4:  # Keep first 4 weeks of high-res data
+            results['fast_results_archive'].append(fast_results.copy())
         
         # 3. Run slow models (TRIFFID + RothC)
         slow_results = run_slow_models_week(
