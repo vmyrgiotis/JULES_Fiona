@@ -13,6 +13,30 @@ from scripts.era5_simulation_run import create_era5_config
 from julesf.soil.equations_moisture import infiltration_rate, evapotranspiration_extraction
 from julesf.soil.parameters import SOIL_LAYERS, SOIL_PROPERTIES, VAN_GENUCHTEN, THERMAL_PROPERTIES
 
+def calculate_blaney_criddle_et(temperature_K, latitude_deg=52.0):
+    """
+    Calculate potential evapotranspiration using Blaney-Criddle method
+    PET₀ = p(0.457 T_mean + 8.128) [mm/day]
+    """
+    # Convert K to °C
+    T_celsius = temperature_K - 273.15
+    
+    # Simplified p factor for mid-latitudes (varies seasonally, but use average)
+    # For UK (52°N): p ≈ 0.27 in summer, 0.23 in winter, average ≈ 0.25
+    p_factor = 0.25
+    
+    # Blaney-Criddle formula (mm/day)
+    PET_mm_day = p_factor * (0.457 * T_celsius + 8.128)
+    
+    # Ensure non-negative
+    PET_mm_day = max(0, PET_mm_day)
+    
+    # Convert mm/day to kg/m²/s
+    # 1 mm/day = 1 kg/m²/day = 1/(24×3600) kg/m²/s
+    PET_kg_m2_s = PET_mm_day / (24 * 3600)
+    
+    return PET_kg_m2_s
+
 def debug_water_balance():
     """Debug the water balance components"""
     print("="*60)
@@ -27,10 +51,10 @@ def debug_water_balance():
     config = create_era5_config(era5_data['drivers'], simulation_weeks=1)  # FIXED: simulation_weeks
     era5_forcing = config['era5_forcing']
     
-    # Setup soil drivers as in fast_models_wrapper
+    # Setup soil drivers with CORRECT Blaney-Criddle
     soil_drivers = {
         'precipitation': lambda t: max(0, era5_forcing['precip'](t)),
-        'evapotranspiration': lambda t: 5e-5 * max(0, (era5_forcing['Tair'](t) - 273.15) / 25),
+        'evapotranspiration': lambda t: calculate_blaney_criddle_et(era5_forcing['Tair'](t)),  # CORRECT FORMULA
     }
     
     # Get parameters

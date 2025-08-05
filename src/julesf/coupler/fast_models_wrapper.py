@@ -114,7 +114,9 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
         era5 = external_drivers['era5_forcing']
         physiology_forcing['pressure'] = lambda t: era5['pressure'](t)  # Pa
         physiology_forcing['co2'] = lambda t: era5['co2'](t)  # ppm
-        print(f"  ✓ Physiology: Using ERA5 pressure and CO2")
+        physiology_forcing['PAR'] = lambda t: era5['PAR'](t)  # W/m²
+        physiology_forcing['T_leaf'] = lambda t: np.interp(t, t_ebm, Ts_ebm) - 273.15  # K to °C
+        print(f"  ✓ Physiology: Using ERA5 pressure, CO2, and PAR")
     else:
         physiology_forcing['pressure'] = lambda t: 101325.0  # Standard pressure
         physiology_forcing['co2'] = lambda t: 400.0  # Default CO2
@@ -135,24 +137,14 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     if external_drivers and 'era5_forcing' in external_drivers:
         era5 = external_drivers['era5_forcing']
         soil_drivers_complete['precipitation'] = lambda t: max(0, era5['precip'](t))  # FIXED KEY
-        
-        # temperature-based ET
-        # TODO: add ET data
-        soil_drivers_complete['evapotranspiration'] = lambda t: (
-            5e-5 * max(0, (era5['Tair'](t) - 273.15) / 25) 
-        )
-
-        # Test precipitation
-        try:
-            test_precip = soil_drivers_complete['precipitation'](24.0)  # 1 day in
-            print(f"  ✓ Soil: Using ERA5 precipitation (test: {test_precip:.6f} kg/m²/s)")
-        except Exception as e:
-            print(f"  ❌ ERA5 precipitation test failed: {e}")
+        soil_drivers_complete['evapotranspiration'] = lambda t: era5['evapotranspiration'](t)
+        print("  ✓ Soil: using ERA5 ET forcing")
+                
     else:
-        soil_drivers_complete['precipitation'] = lambda t: 1e-5  # Default precipitation
-        soil_drivers_complete['evapotranspiration'] = lambda t: 2e-5  # Default ET rate
-        print(f"  ✓ Soil: Using default precipitation and evaporatranspiration")
-    
+        soil_drivers_complete['precipitation'] = lambda t: 1e-5
+        soil_drivers_complete['evapotranspiration'] = lambda t: 0.0
+        print(f"  ✓ Soil: no ET input, set to zero")
+
     # Add EBM surface temperature coupling
     soil_drivers_complete['T_surface'] = lambda t: np.interp(t, t_ebm, Ts_ebm)
     
@@ -196,28 +188,13 @@ def run_physiology_coupled(physiology_forcing, LAI, nu_cover, soil_state, days=7
     
     def gen_forcings_coupled(settings):
         t = np.arange(0, days * 24, dt_hours)
-        
-        # Temperature from EBM (coupled)
-        T_leaf_C = np.array([physiology_forcing['T_leaf'](ti) for ti in t])
-        
-        # I_par: SMART BACKUP PLAN - simple sinusoidal pattern
-        # TODO: Implement JULES original method
-        hour_of_day = t % 24
-        daylight_hours = (hour_of_day >= 6) & (hour_of_day <= 18)
-        I_par = np.where(daylight_hours, 
-                        800 * np.sin(np.pi * (hour_of_day - 6) / 12),  # Peak at noon
-                        0)
-        I_par = np.maximum(I_par, 0)  # No negative light
-        
-        # CO2 from ERA5 (external forcing)
-        ci = np.array([physiology_forcing['co2'](ti) for ti in t])
-        
-        # Oxygen (constant)
-        O2 = np.full_like(t, 21000)  # ppmv
+        T_leaf_C  = np.array([physiology_forcing['T_leaf'](ti) for ti in t])        
+        I_par     = np.array([physiology_forcing['PAR'](ti)    for ti in t])
+        ci        = np.array([physiology_forcing['co2'](ti)    for ti in t])
+        O2        = np.full_like(t, 21000)  # ppmv
         
         return t, T_leaf_C, I_par, ci, O2
     
-    # Monkey patch and run
     import julesf.physiology.simulation as sim
     original_gen_forcings = sim.generate_forcings
     sim.generate_forcings = gen_forcings_coupled
@@ -232,3 +209,35 @@ def run_physiology_coupled(physiology_forcing, LAI, nu_cover, soil_state, days=7
     sim.generate_forcings = original_gen_forcings
     
     return t_npp, npp
+
+# def calculate_blaney_criddle_et(temperature_K, latitude_deg=52.0):
+#     """
+#     Calculate potential evapotranspiration using Blaney-Criddle method
+#     TODO: Replace with JULES original method/external forcing data if available
+    
+#     PET₀ = p(0.457 T_mean + 8.128) [mm/day]
+    
+#     Parameters:
+#     - temperature_K: air temperature in Kelvin
+#     - latitude_deg: latitude in degrees (default 52°N for UK)
+    
+#     Returns:
+#     - PET in kg/m²/s
+#     """
+#     # Convert K to °C
+#     T_celsius = temperature_K - 273.15
+    
+#     # Simplified p factor for mid-latitudes (varies seasonally, but use average)
+#     p_factor = 0.488
+    
+#     # Blaney-Criddle formula (mm/day)
+#     PET_mm_day = p_factor * (0.457 * T_celsius + 8.128)
+    
+#     # Ensure non-negative
+#     PET_mm_day = max(0, PET_mm_day)
+    
+#     # Convert mm/day to kg/m²/s
+#     # 1 mm/day = 1 kg/m²/day = 1/(24×3600) kg/m²/s
+#     PET_kg_m2_s = PET_mm_day / (24 * 3600)
+    
+#     return PET_kg_m2_s

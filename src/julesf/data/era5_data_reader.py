@@ -13,20 +13,19 @@ class ERA5DataReader:
         
         self.var_mapping = {
             # Temperature
-            't2m': 'air_temperature',  # K
-            
-            # Radiation components for EBM
-            'ssr': 'net_shortwave',    # W/m²
-            'str': 'net_longwave',     # W/m²
-            'ssrd': 'shortwave_down',  # W/m²
-            'strd': 'longwave_down',   # W/m²
-            
+            't2m': 'air_temperature',  
+            # Radiation for EBM
+            'ssr': 'net_shortwave',    
+            'str': 'net_longwave',     
+            'ssrd': 'shortwave_down',  
+            'strd': 'longwave_down',   
             # Hydrology
             'tp': 'precipitation',     # kg/m²/s
-            
-            # Atmospheric conditions
-            'sp': 'surface_pressure',  # Pa
-            'co2': 'co2_concentration' # ppm
+            'ET_mm_hr': 'evapotranspiration',  # mm/hr
+            'PAR': 'PAR',              # W/m²
+            # Atmosphere
+            'sp': 'surface_pressure',  
+            'co2': 'co2_concentration' 
         }
     
     def load_data(self):

@@ -26,13 +26,8 @@ def create_era5_config(era5_drivers, simulation_weeks=52):
     
     # Map ERA5 data to model variables
     era5_forcing = {
-        'Tair': era5_drivers['air_temperature'],        # K
-        'Sdn': era5_drivers['shortwave_down'],          # W/m²
-        'Ldn': era5_drivers['longwave_down'],           # W/m²
-        'Q1': estimate_humidity,                        # kg/kg (estimated)
-        'precip': era5_drivers['precipitation'],        # kg/m²/s
-        'pressure': era5_drivers['surface_pressure'],   # Pa
-        'co2': era5_drivers['co2_concentration'],       # ppm
+        'evapotranspiration': lambda t: max(0, era5_drivers['evapotranspiration'](t) / 3600.0),      # convert to kg/m²/s: ET_mm_hr / 3600
+        'PAR': era5_drivers['PAR'],                     # W m-2
     }
     
     print(f"✓ ERA5 config created with variables: {list(era5_forcing.keys())}")
