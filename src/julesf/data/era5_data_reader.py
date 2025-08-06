@@ -195,7 +195,6 @@ def load_era5_for_jules(data_file, metadata_file, timestep_hours=0.5):
     }
 
 if __name__ == "__main__":
-    # Test the reader - fix file paths
     import os
     
     # Get the correct paths relative to the script location

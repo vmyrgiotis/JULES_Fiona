@@ -157,10 +157,10 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     
     
     # ========== 6. RUN SOIL MODEL ==========
-    # FIXED: Handle soil_initial properly - can be None, array, or dict
     theta_arg = None
     T_arg = None
     
+    # If soil_initial is provided, use it to initialize soil state
     if soil_initial is not None:
         if isinstance(soil_initial, dict):
             # Dictionary format: {'theta': array, 'T_soil': array}
@@ -199,9 +199,6 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     }
 
 def run_physiology_coupled(physiology_forcing, LAI, nu_cover, soil_state, days=7, dt_hours=0.5):
-    """
-    Run physiology with coupled inputs from EBM, TRIFFID, and Soil
-    """
     from julesf.physiology.parameters import SIM_SETTINGS
     from julesf.physiology.simulation import generate_forcings
     
@@ -229,6 +226,7 @@ def run_physiology_coupled(physiology_forcing, LAI, nu_cover, soil_state, days=7
     
     return t_npp, npp
 
+# Previous method for calculating ET (not using ERA5 data), uncomment if needed for future use
 # def calculate_blaney_criddle_et(temperature_K, latitude_deg=52.0):
 #     """
 #     Calculate potential evapotranspiration using Blaney-Criddle method

@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add project root to path
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
 from src.julesf.data.era5_data_reader import load_era5_for_jules
@@ -11,9 +10,6 @@ from src.julesf.coupler.jules_master import jules_master_coupler
 from src.julesf.visualization.coupling_plots import visualize_jules_coupling
 
 def create_era5_config(era5_drivers, simulation_weeks=52):
-    """
-    Create clean ERA5 forcing configuration
-    """
     def estimate_humidity(t):
         Ta = era5_drivers['air_temperature'](t)
         q_star = 0.01 * np.exp(0.07 * (Ta - 273.15))
@@ -26,9 +22,7 @@ def create_era5_config(era5_drivers, simulation_weeks=52):
         'Q1':              estimate_humidity,                      # 1
         'precip':          era5_drivers['precipitation'],          # kg/m²/s (no change)
         # FIX: convert ET mm/h → m/h → m/s → kg/m²/s
-        'evapotranspiration': lambda t: era5_drivers['evapotranspiration'](t) 
-                                     / 1000.0  # mm→m
-                                     / 3600.0, # h→s
+        'evapotranspiration': lambda t: era5_drivers['evapotranspiration'](t) /3600.0,  
         'PAR':             era5_drivers['PAR'],                    # W/m²
         'pressure':        era5_drivers['surface_pressure'],       # Pa
         'co2':             era5_drivers['co2_concentration'],      # ppm
@@ -44,9 +38,6 @@ def create_era5_config(era5_drivers, simulation_weeks=52):
     }
 
 def run_jules_era5_simulation(data_file, metadata_file, weeks=52, output_dir='results', days_to_plot=30):
-    """
-    Run JULES simulation with ERA5 meteorological forcing
-    """
     print("=== JULES Simulation with ERA5 Forcing ===")
     
     # 1. Load ERA5 data
@@ -133,7 +124,6 @@ def run_jules_era5_simulation(data_file, metadata_file, weeks=52, output_dir='re
         raise
 
 def save_era5_summary(era5_summary, output_dir):
-    """Save summary of ERA5 meteorological data"""
     summary_file = os.path.join(output_dir, 'era5_summary.txt')
     
     with open(summary_file, 'w') as f:
@@ -150,7 +140,6 @@ def save_era5_summary(era5_summary, output_dir):
     print(f"✓ ERA5 summary saved to: {summary_file}")
 
 def plot_era5_forcing(era5_data, output_dir, days_to_plot=30):
-    """Plot ERA5 forcing data for visual inspection"""
     data = era5_data['data']
     time_hours = data['time_hours']
     
