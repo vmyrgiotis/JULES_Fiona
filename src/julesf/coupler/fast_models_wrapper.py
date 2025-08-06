@@ -140,7 +140,7 @@ def run_fast_models_week(nu_cover, LAI_total, soil_initial, week_num=0, external
     
     if external_drivers and 'era5_forcing' in external_drivers:
         era5 = external_drivers['era5_forcing']
-        soil_drivers_complete['precipitation'] = lambda t: max(0, era5['precip'](t))  # FIXED KEY
+        soil_drivers_complete['precipitation']    = lambda t: max(0, era5['precip'](t))
         soil_drivers_complete['evapotranspiration'] = lambda t: era5['evapotranspiration'](t)
         print("  ✓ Soil: using ERA5 ET forcing")
                 

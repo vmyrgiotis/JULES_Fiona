@@ -24,8 +24,11 @@ def create_era5_config(era5_drivers, simulation_weeks=52):
         'Sdn':             era5_drivers['shortwave_down'],         # W/m²
         'Ldn':             era5_drivers['longwave_down'],          # W/m²
         'Q1':              estimate_humidity,                      # 1
-        'precip':          era5_drivers['precipitation'],          # kg/m²/s
-        'evapotranspiration': era5_drivers['evapotranspiration'],  # kg/m²/s
+        'precip':          era5_drivers['precipitation'],          # kg/m²/s (no change)
+        # FIX: convert ET mm/h → m/h → m/s → kg/m²/s
+        'evapotranspiration': lambda t: era5_drivers['evapotranspiration'](t) 
+                                     / 1000.0  # mm→m
+                                     / 3600.0, # h→s
         'PAR':             era5_drivers['PAR'],                    # W/m²
         'pressure':        era5_drivers['surface_pressure'],       # Pa
         'co2':             era5_drivers['co2_concentration'],      # ppm
@@ -327,11 +330,12 @@ def plot_high_resolution_results(results, era5_data, output_dir, weeks_to_plot=2
     actual_time_hours = time_hours[:len(time_days)]
     
     try:
-        precip_series = [drivers['precipitation'](t) * 3600 * 1000 for t in actual_time_hours]
-        et_series = [drivers['evapotranspiration'](t) * 3600 * 1000 for t in actual_time_hours]
+        # now drivers[...] return kg/m²/s → *3600 → mm/h
+        precip_series = [drivers['precipitation'](t) * 3600.0 for t in actual_time_hours]
+        et_series     = [drivers['evapotranspiration'](t) * 3600.0 for t in actual_time_hours]
         
-        axes[1, 0].bar(time_days, precip_series, width=0.01, alpha=0.6, color='blue', label='Precipitation')
-        ax_twin = axes[1, 0].twinx()
+        axes[1,0].bar(time_days, precip_series, width=0.01, alpha=0.6, color='blue', label='Precipitation')
+        ax_twin = axes[1,0].twinx()
         ax_twin.plot(time_days, et_series, 'r-', label='ET')
         axes[1, 0].set_ylabel('Precipitation (mm/hr)', color='blue')
         ax_twin.set_ylabel('ET (mm/hr)', color='red')

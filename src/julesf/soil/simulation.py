@@ -41,13 +41,19 @@ def generate_soil_forcings(days=7, dt_hours=0.5):
     
     # Create interpolation functions for drivers
     from scipy.interpolate import interp1d
+
+    rho_water = 1000.0  # kg/m³
+
+    # Convert precip depth (m per dt_hours) → flux kg/m²/s
+    precip_flux = precip * rho_water / (dt_hours * 3600.0)
+
     drivers = {
         'air_temperature': interp1d(t, T_air, bounds_error=False, fill_value='extrapolate'),
-        'precipitation': interp1d(t, precip, bounds_error=False, fill_value=0),
-        'evapotranspiration': interp1d(t, ET, bounds_error=False, fill_value=0),
-        'surface_heat_flux': interp1d(t, G_surface, bounds_error=False, fill_value=0),
+        'precipitation':   interp1d(t, precip_flux, bounds_error=False, fill_value=0.0),
+        'evapotranspiration': interp1d(t, ET, bounds_error=False, fill_value=0.0),
+        'surface_heat_flux': interp1d(t, G_surface, bounds_error=False, fill_value=0.0),
     }
-    
+
     return t, drivers
 
 def soil_rhs(t, y, params, drivers):
