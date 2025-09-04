@@ -10,7 +10,6 @@ authors = [
   { name = "fionazfang", email = "xxxxxxxxxxx.fionazfang@users.noreply.github.com" },
 ]
 readme = "README.md"
-license = "MIT"
 requires-python = ">=3.13"
 dependencies = [
   "numpy",
